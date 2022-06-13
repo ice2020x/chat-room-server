@@ -1,0 +1,47 @@
+{
+  "userId": {
+    "timestamp": 1640030050,
+    "date": 1640030050000
+  },
+  "uid": "61c0df625e296963ff277052",
+  "username": "17728108553",
+  "password": "$2a$10$kWPJQIxmOlytku322UofcuYhEFCPSE73LFIT0ENbiUFRg.FZHTScS",
+  "code": "10000010",
+  "photo": "https://chat-ice.oss-cn-beijing.aliyuncs.com/chat/9138f18c-1723-4d97-b027-c92c113bd707.jpg",
+  "signature": "",
+  "nickname": "伊瓜因3142",
+  "email": "",
+  "province": {
+    "name": "广东省",
+    "code": "510000"
+  },
+  "city": {
+    "name": "广州市",
+    "code": "510000"
+  },
+  "town": {
+    "name": "海珠区",
+    "code": "510000"
+  },
+  "sex": 3,
+  "opacity": 0.75,
+  "blur": 10,
+  "notifySound": "default",
+  "bgColor": "#fff",
+  "signUpTime": 1640030050420,
+  "lastLogin": 1640051144254,
+  "status": 0,
+  "age": 18,
+  "onlineTime": 0,
+  "loginSetting": null,
+  "lastLoginTime": 1640050798066,
+  "friendFenZu": {
+    "bestFriend": []
+  },
+  "friendBeiZhu": {},
+  "enabled": true,
+  "authorities": [],
+  "accountNonLocked": true,
+  "credentialsNonExpired": true,
+  "accountNonExpired": true
+}

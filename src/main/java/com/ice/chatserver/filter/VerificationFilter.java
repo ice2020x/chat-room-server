@@ -30,8 +30,6 @@ public class VerificationFilter extends GenericFilter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
-         System.out.println("请求路径为：" + req.getServletPath());
-         System.out.println("请求方法为：" + req.getMethod());
         if ("POST".equals(req.getMethod()) && ("/user/login".equals(req.getServletPath()))) {
             //从cookie中获取uuid
             String kaptchaOwner = CookieUtil.getValue(req, "kaptchaOwner");

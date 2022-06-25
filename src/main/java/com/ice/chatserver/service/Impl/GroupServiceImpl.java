@@ -78,7 +78,7 @@ public class GroupServiceImpl implements GroupService {
                         "holderUsers"
                 ), Aggregation.match(
                         Criteria.where(requestVo.getType()).regex(Pattern.compile("^.*" + requestVo.getSearchContent() + ".*$", Pattern.CASE_INSENSITIVE))
-                ), Aggregation.skip(Long.valueOf(requestVo.getPageIndex() * requestVo.getPageSize())),
+                ), Aggregation.skip((long) (requestVo.getPageIndex() - 1) * requestVo.getPageSize()),
                 Aggregation.limit((long) requestVo.getPageSize()),
                 Aggregation.sort(Sort.Direction.DESC, "_id")
         );

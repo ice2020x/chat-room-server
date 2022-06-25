@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModifyFriendBeiZhuRequestVo {
-    private String userId;
     private String friendId;
     private String friendBeiZhuName;
 }

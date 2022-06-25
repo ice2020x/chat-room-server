@@ -21,8 +21,8 @@ class UserServiceImplTest {
 
         SearchRequestVo searchRequestVo = new SearchRequestVo();
 
-        searchRequestVo.setSearchContent("31");
-        searchRequestVo.setType("username");
+        searchRequestVo.setSearchContent("伊瓜");
+        searchRequestVo.setType("nickname");
         searchRequestVo.setPageIndex(0);
         searchRequestVo.setPageSize(9);
         HashMap<String, Object> stringObjectHashMap = userService.searchUser(searchRequestVo, "61be0e3ae7fd6865cbcd74c7");

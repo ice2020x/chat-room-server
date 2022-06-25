@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
             os.close();//关闭流
 
         } catch (IOException e) {
-            log.info("No converter for [class com.ice.chatserver.common.R] with preset Content-Type 'image/jpeg'");
+//            log.info("No converter for [class com.ice.chatserver.common.R] with preset Content-Type 'image/jpeg'");
         }
         return R.ok().message("验证码获取成功");
     }
@@ -184,8 +184,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public R modifyFriendBeiZhu(ModifyFriendBeiZhuRequestVo requestVo) {
-        User userInfo = userDao.findById(new ObjectId(requestVo.getUserId())).orElse(null);
+    public R modifyFriendBeiZhu(ModifyFriendBeiZhuRequestVo requestVo, String userId) {
+        User userInfo = userDao.findById(new ObjectId(userId)).orElse(null);
         if(userInfo==null){
             return R.error().message("没有该用户");
         }
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
         friendBeiZhuMap.put(requestVo.getFriendId(), requestVo.getFriendBeiZhuName());
         //更新用户信息，查询条件
         Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(new ObjectId(requestVo.getUserId())));
+        query.addCriteria(Criteria.where("_id").is(new ObjectId(userId)));
         Update update = new Update();
         update.set("friendBeiZhu", friendBeiZhuMap);
         mongoTemplate.findAndModify(query, update, User.class);
@@ -456,7 +456,7 @@ public class UserServiceImpl implements UserService {
                         Criteria.where(requestVo.getType()).regex(Pattern.compile("^.*" + requestVo.getSearchContent() + ".*$", Pattern.CASE_INSENSITIVE))
                                 .and("uid").ne(uid)
                 ).with(Sort.by(Sort.Direction.DESC, "_id"))
-                .skip((long) requestVo.getPageIndex() * requestVo.getPageSize())
+                .skip((long) (requestVo.getPageIndex() - 1) * requestVo.getPageSize())
                 .limit(requestVo.getPageSize());
         Query query1 = new Query();
 

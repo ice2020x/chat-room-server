@@ -50,7 +50,7 @@ public interface UserService {
     * @Date: 2021/12/18
     * @Description: 修改备注信息
     **/
-    R modifyFriendBeiZhu(ModifyFriendBeiZhuRequestVo requestVo);
+    R modifyFriendBeiZhu(ModifyFriendBeiZhuRequestVo requestVo, String userId);
 
     /**
      * @author ice2020x

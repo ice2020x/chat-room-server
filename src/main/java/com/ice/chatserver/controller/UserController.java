@@ -78,8 +78,10 @@ public class UserController {
      * @Description: 修改备注信息
      **/
     @PostMapping("/updateFriendBeiZhu")
-    public R modifyFriendBeiZhu(@RequestBody ModifyFriendBeiZhuRequestVo requestVo) {
-        return userService.modifyFriendBeiZhu(requestVo);
+    public R modifyFriendBeiZhu(@RequestBody ModifyFriendBeiZhuRequestVo requestVo, HttpServletRequest request) {
+        JwtInfo infoByJwtToken = JwtUtils.getInfoByJwtToken(request);
+        String userId = infoByJwtToken.getUserId();
+        return userService.modifyFriendBeiZhu(requestVo, userId);
     }
 
     /**

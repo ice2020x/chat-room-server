@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface AccountPoolDao extends MongoRepository<AccountPool, String> {
+public interface AccountPoolDao extends  MongoRepository<AccountPool, String> {
 
 }

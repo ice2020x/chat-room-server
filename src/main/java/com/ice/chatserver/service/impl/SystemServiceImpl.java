@@ -1,4 +1,4 @@
-package com.ice.chatserver.service.Impl;
+package com.ice.chatserver.service.impl;
 
 import com.ice.chatserver.dao.SysDao;
 import com.ice.chatserver.pojo.FeedBack;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

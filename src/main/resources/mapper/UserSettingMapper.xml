@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ice.chatserver.mapper.UserSettingMapper">
+
+    <resultMap id="BaseResultMap" type="com.ice.chatserver.pojo.UserSetting">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="primaryColor" column="primary_color" jdbcType="VARCHAR"/>
+            <result property="backgroundColor" column="background_color" jdbcType="VARCHAR"/>
+            <result property="chatTop" column="chat_top" jdbcType="VARCHAR"/>
+            <result property="publicStatus" column="public_status" jdbcType="INTEGER"/>
+            <result property="notifyStatus" column="notify_status" jdbcType="INTEGER"/>
+            <result property="volume" column="volume" jdbcType="INTEGER"/>
+            <result property="messageNotify" column="message_notify" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,primary_color,
+        background_color,chat_top,public_status,
+        notify_status,volume,message_notify
+    </sql>
+</mapper>

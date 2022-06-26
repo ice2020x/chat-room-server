@@ -1,4 +1,4 @@
-package com.ice.chatserver.service.Impl;
+package com.ice.chatserver.service.impl;
 
 import com.ice.chatserver.dao.SingleMessageDao;
 import com.ice.chatserver.pojo.SingleMessage;
@@ -7,7 +7,6 @@ import com.ice.chatserver.pojo.vo.IsReadMessageRequestVo;
 import com.ice.chatserver.pojo.vo.SingleHistoryResultVo;
 import com.ice.chatserver.pojo.vo.SingleMessageResultVo;
 import com.ice.chatserver.service.SingleMessageService;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

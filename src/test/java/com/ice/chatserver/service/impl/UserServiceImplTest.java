@@ -1,4 +1,4 @@
-package com.ice.chatserver.service.Impl;
+package com.ice.chatserver.service.impl;
 
 import com.ice.chatserver.pojo.vo.SearchRequestVo;
 import com.ice.chatserver.service.UserService;
@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserServiceImplTest {

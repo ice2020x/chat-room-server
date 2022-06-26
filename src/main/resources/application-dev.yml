@@ -23,6 +23,11 @@ spring:
     database: 5
     host: 127.0.0.1
     port: 6379
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/chatdb
 logging:
   level:
     org.springframework.data.mongodb.core: DEBUG
@@ -52,3 +57,7 @@ tenxunyun:
     appkey: 81077a6d729e4096ef92d31b2f9c5b9f
     templateId: 1169449
     smsSign: 学习者画像平台公众号
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2LoggerImpl
+    map-underscore-to-camel-case: true

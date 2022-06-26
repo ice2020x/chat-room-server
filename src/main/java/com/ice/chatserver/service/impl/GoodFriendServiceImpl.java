@@ -1,6 +1,5 @@
-package com.ice.chatserver.service.Impl;
+package com.ice.chatserver.service.impl;
 
-import com.ice.chatserver.common.ResultEnum;
 import com.ice.chatserver.dao.GoodFriendDao;
 import com.ice.chatserver.dao.UserDao;
 import com.ice.chatserver.pojo.GoodFriend;
@@ -16,11 +15,8 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;

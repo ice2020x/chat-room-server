@@ -1,4 +1,4 @@
-package com.ice.chatserver.service.Impl;
+package com.ice.chatserver.service.impl;
 
 import com.ice.chatserver.pojo.vo.SimpleUser;
 import com.ice.chatserver.service.OnlineUserService;

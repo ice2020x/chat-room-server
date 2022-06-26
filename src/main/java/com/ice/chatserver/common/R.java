@@ -26,7 +26,7 @@ public class R {
     * @Date: 2021/12/18
     * @Description: 构造函数私有，防止造出对象
     **/
-    private R() {
+    protected R() {
     }
 
     /**

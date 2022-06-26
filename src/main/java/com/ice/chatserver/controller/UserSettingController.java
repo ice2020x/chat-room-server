@@ -9,7 +9,6 @@ import com.ice.chatserver.service.UserSettingService;
 import com.ice.chatserver.utils.JwtUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.graalvm.compiler.lir.LIRInstruction;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

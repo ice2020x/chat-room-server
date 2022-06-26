@@ -6,6 +6,9 @@ import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.ice.chatserver.common.ConstValueEnum;
+import com.ice.chatserver.common.R;
+import com.ice.chatserver.common.SocketR;
+import com.ice.chatserver.common.constant.SocketRConstant;
 import com.ice.chatserver.filter.SensitiveFilter;
 import com.ice.chatserver.pojo.*;
 import com.ice.chatserver.pojo.vo.*;
@@ -248,8 +251,9 @@ public class SocketEventHandler {
                     item.sendEvent("receiveValidateMessage", validateMessage);
                 }
             }
-        }else {
-            // TODO 添加失败 发送到 client
+            client.sendEvent("sendValidateMessage", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+        } else {
+            client.sendEvent("sendValidateMessage", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
         }
     }
 

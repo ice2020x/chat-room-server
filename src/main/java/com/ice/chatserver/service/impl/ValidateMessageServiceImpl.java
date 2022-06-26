@@ -36,7 +36,7 @@ public class ValidateMessageServiceImpl implements ValidateMessageService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<ValidateMessageResponseVo> getMyValidateMessageList(String userId,Integer status, Integer validateType) {
+    public List<ValidateMessageResponseVo> getMyValidateMessageList(String userId, Integer status, Integer validateType) {
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.lookup(
                         "groups",
@@ -64,38 +64,40 @@ public class ValidateMessageServiceImpl implements ValidateMessageService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 根据id查询一条记录
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 根据id查询一条记录
+     **/
     @Override
     public ValidateMessage findValidateMessage(String roomId, Integer status, Integer validateType) {
         return validateMessageDao.findValidateMessageByRoomIdAndStatusAndValidateType(roomId, status, validateType);
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 添加一个验证消息
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 添加一个验证消息
+     **/
     @Override
     public ValidateMessage addValidateMessage(ValidateMessage validateMessage) {
         //查出未处理状态
-        validateMessageDao.save(validateMessage);
+        // 这里逻辑错误 进行先验证再保存
+//        validateMessageDao.save(validateMessage);
         ValidateMessage res = findValidateMessage(validateMessage.getRoomId(), 0, validateMessage.getValidateType());
         System.out.println("查到的验证消息为：" + res);
-        if (res == null) {
-            return validateMessageDao.save(validateMessage);
-        }else{
-            return null;
+        // 下面的逻辑就是 要么添加 要么更新  有id就是更新 应该是这样的
+        if (res != null) {
+            // 已存在的情况进行更新 设置了id 应该就是更新了
+            validateMessage.setId(res.getId());
         }
+        return validateMessageDao.save(validateMessage);
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 更新状态
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 更新状态
+     **/
     @Override
     public void changeFriendValidateNewsStatus(String validateMessageId, Integer status) {
         Query query = new Query();
@@ -107,10 +109,10 @@ public class ValidateMessageServiceImpl implements ValidateMessageService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 为什么写两个方法，单纯不想多加一个参数，代码几乎一模一样
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 为什么写两个方法，单纯不想多加一个参数，代码几乎一模一样
+     **/
     @Override
     public void changeGroupValidateNewsStatus(String validateMessageId, Integer status) {
         Query query = new Query();

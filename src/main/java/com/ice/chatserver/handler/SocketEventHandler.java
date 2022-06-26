@@ -248,6 +248,8 @@ public class SocketEventHandler {
                     item.sendEvent("receiveValidateMessage", validateMessage);
                 }
             }
+        }else {
+            // TODO 添加失败 发送到 client
         }
     }
 

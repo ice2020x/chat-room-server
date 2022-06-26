@@ -57,8 +57,8 @@ public class UserController {
      * @Description: 根据用户id获取用户详细信息
      **/
     @GetMapping("/getUserInfo/{uid}")
-    public R getUserInfo(@PathVariable("uid") String uid) {
-        return userService.getUserInfo(uid);
+    public R getUserInfo(@PathVariable("uid") String uid,HttpServletRequest request) {
+        return userService.getUserInfo(uid,request);
     }
 
 
@@ -120,13 +120,13 @@ public class UserController {
      * @Description: 更新用户的配置信息
      **/
     @PostMapping("/updateUserConfigure")
-    public R updateUserConfigure(@RequestBody UpdateUserConfigureRequestVo requestVo) {
+    public R updateUserConfigure(@RequestBody UpdateUserConfigureRequestVo requestVo,HttpServletRequest request) {
 
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean res = userService.updateUserConfigure(requestVo, userId);
         if (res) {
             //同时携带用户信息去更新全局的用户信息
-            User userInfo = (User) userService.getUserInfo(userId).getData().get("user");
+            User userInfo = (User) userService.getUserInfo(userId,request).getData().get("user");
             return R.ok().data("userInfo", userInfo);
         } else {
             return R.error();

@@ -36,8 +36,7 @@ public interface UserService {
     * @Date: 2021/12/18
     * @Description: 根据用户id获取用户详细信息
     **/
-    public R getUserInfo(String userId);
-
+    public R getUserInfo(String userId,HttpServletRequest request);
     /**
     * @author ice2020x
     * @Date: 2021/12/18

@@ -4,13 +4,16 @@ import com.ice.chatserver.common.ConstValueEnum;
 import com.ice.chatserver.common.R;
 import com.ice.chatserver.common.ResultEnum;
 import com.ice.chatserver.dao.AccountPoolDao;
+import com.ice.chatserver.dao.GoodFriendDao;
 import com.ice.chatserver.dao.UserDao;
 import com.ice.chatserver.pojo.AccountPool;
 import com.ice.chatserver.pojo.User;
+import com.ice.chatserver.pojo.config.JwtInfo;
 import com.ice.chatserver.pojo.vo.*;
 import com.ice.chatserver.service.UserService;
 import com.ice.chatserver.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -56,17 +59,17 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private RedisTemplate<String, String> redisTemplate;
-
-
+    @Resource
+    GoodFriendDao goodFriendDao;
 
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Param: rvo 注册的信息
-    * @return: 注册结果 R
-    * @Description:
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Param: rvo 注册的信息
+     * @return: 注册结果 R
+     * @Description:
+     **/
     @Override
     public R register(RegisterRequestVo registerVo) {
         String code = registerVo.getCode();
@@ -103,7 +106,7 @@ public class UserServiceImpl implements UserService {
             user.setNickname(ChatServerUtil.randomNickname());
             userDao.save(user);
             if (user.getUserId() != null) {
-                return R.ok().resultEnum(ResultEnum.REGISTER_SUCCESS).data("userCode",user.getCode());
+                return R.ok().resultEnum(ResultEnum.REGISTER_SUCCESS).data("userCode", user.getCode());
             } else {
                 return R.error().resultEnum(ResultEnum.REGISTER_FAILED);
             }
@@ -131,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
             // redis 有效时间为 1000s
             redisTemplate.opsForValue().set(redisKey, randomText, 1000, TimeUnit.SECONDS);
-            System.out.println("redisKey:"+redisKey+",code:"+randomText);
+            System.out.println("redisKey:" + redisKey + ",code:" + randomText);
             response.setContentType("image/jpeg");
             OutputStream os = response.getOutputStream();
             //输出图片流
@@ -146,29 +149,49 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public R getUserInfo(String userId) {
+    public R getUserInfo(String userId, HttpServletRequest request) {
         User user = userDao.findById(new ObjectId(userId)).orElse(null);
-        if(user!=null){
-            return R.ok().data("user",user).message("获取用户详细信息成功");
-        }else {
+        final String currentUserId = getUserId(request);
+        if (user != null) {
+            if (StringUtils.isNoneBlank(currentUserId)) {
+                final long count = mongoTemplate.count(new Query().addCriteria(Criteria.where("userM").is(currentUserId).and("userY").is(userId)), Integer.class);
+                user.setMyFriend(count > 0);
+                final long count2 = mongoTemplate.count(new Query().addCriteria(Criteria.where("userY").is(currentUserId).and("userM").is(userId)), Integer.class);
+                user.setMyFriend(count2 > 0);
+            }
+            return R.ok().data("user", user).message("获取用户详细信息成功");
+        } else {
             return R.error().message("获取用户详细信息失败");
         }
     }
 
+
+    private String getUserId(HttpServletRequest request) {
+        JwtInfo infoByJwtToke = JwtUtils.getInfoByJwtToken(request);
+        if (org.apache.commons.lang3.ObjectUtils.isEmpty(infoByJwtToke)) {
+            return "";
+        }
+        final String userId = infoByJwtToke.getUserId();
+        if (StringUtils.isBlank(userId)) {
+            return "";
+        }
+        return userId;
+    }
+
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 添加新的分组
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 添加新的分组
+     **/
     @Override
     public R addNewFenZu(NewFenZuRequestVo requestVo) {
-        try{
+        try {
             User user = userDao.findById(new ObjectId(requestVo.getUserId())).orElse(null);
-            if(user==null){
+            if (user == null) {
                 return R.error().message("没有该用户！");
             }
             Map<String, ArrayList<String>> friendFenZu = user.getFriendFenZu();
-            if(!friendFenZu.containsKey(requestVo.getFenZuName())){
+            if (!friendFenZu.containsKey(requestVo.getFenZuName())) {
                 friendFenZu.put(requestVo.getFenZuName(), new ArrayList<>());
                 Update update = new Update();
                 update.set("friendFenZu", friendFenZu);
@@ -177,7 +200,7 @@ public class UserServiceImpl implements UserService {
                 mongoTemplate.findAndModify(query, update, User.class);
             }
             return R.ok().message("添加分组成功");
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             e.printStackTrace();
             return R.error().message("添加分组失败");
         }
@@ -186,7 +209,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public R modifyFriendBeiZhu(ModifyFriendBeiZhuRequestVo requestVo, String userId) {
         User userInfo = userDao.findById(new ObjectId(userId)).orElse(null);
-        if(userInfo==null){
+        if (userInfo == null) {
             return R.error().message("没有该用户");
         }
         Map<String, String> friendBeiZhuMap = userInfo.getFriendBeiZhu();
@@ -201,23 +224,23 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 修改好友分组
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 修改好友分组
+     **/
     @Override
     public R modifyFriendFenZu(ModifyFriendFenZuRequestVo requestVo) {
         User userInfo = userDao.findById(new ObjectId(requestVo.getUserId())).orElse(null);
-        if(userInfo==null){
+        if (userInfo == null) {
             return R.error().message("没有该用户");
         }
-        System.out.println("requestVo"+requestVo.getNewFenZuName());
+        System.out.println("requestVo" + requestVo.getNewFenZuName());
         boolean flag = false;
         Map<String, ArrayList<String>> friendFenZu = userInfo.getFriendFenZu();
         for (Map.Entry<String, ArrayList<String>> entry : friendFenZu.entrySet()) {
             Iterator<String> iterator = entry.getValue().iterator();
-            while (iterator.hasNext()){
-                if(iterator.next().equals(requestVo.getFriendId())){
+            while (iterator.hasNext()) {
+                if (iterator.next().equals(requestVo.getFriendId())) {
                     if (!entry.getKey().equals(requestVo.getNewFenZuName())) {
                         iterator.remove();
                         //没必要再循环了
@@ -227,14 +250,14 @@ public class UserServiceImpl implements UserService {
                 }
             }
             // 外循环也没有必要循环了
-            if(flag){
+            if (flag) {
                 break;
             }
         }
 
         String newFenZuName = requestVo.getNewFenZuName();
         ArrayList<String> strings = friendFenZu.get(newFenZuName);
-        if(ObjectUtils.isEmpty(strings)){
+        if (ObjectUtils.isEmpty(strings)) {
             strings = new ArrayList<String>();
         }
         strings.add(requestVo.getFriendId());
@@ -249,7 +272,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public R deleteFenZu(DelFenZuRequestVo requestVo) {
         User userInfo = userDao.findById(new ObjectId(requestVo.getUserId())).orElse(null);
-        if(userInfo==null){
+        if (userInfo == null) {
             return R.error().message("没有该用户");
         }
         Map<String, ArrayList<String>> friendFenZuMap = userInfo.getFriendFenZu();
@@ -263,14 +286,14 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 更新分组名
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 更新分组名
+     **/
     @Override
     public R editFenZu(EditFenZuRequestVo requestVo) {
         User userInfo = userDao.findById(new ObjectId(requestVo.getUserId())).orElse(null);
-        if(userInfo==null){
+        if (userInfo == null) {
             return R.error().message("没有该用户");
         }
         Map<String, ArrayList<String>> friendFenZuMap = userInfo.getFriendFenZu();
@@ -286,10 +309,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 统计在线时长
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 统计在线时长
+     **/
     @Override
     public void updateOnlineTime(long onlineTime, String uid) {
         Update update = new Update();
@@ -300,10 +323,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 更新用户的配置
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 更新用户的配置
+     **/
     @Override
     public boolean updateUserConfigure(UpdateUserConfigureRequestVo requestVo, String uid) {
         Query query = new Query();
@@ -317,10 +340,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 每次只修该一个参数，傻瓜式修改
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 每次只修该一个参数，傻瓜式修改
+     **/
     @Override
     public Map<String, Object> updateUserInfo(UpdateUserInfoRequestVo requestVo) {
         Map<String, Object> map = new HashMap<>();
@@ -413,20 +436,20 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 获取全部用户
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 获取全部用户
+     **/
     @Override
     public List<User> getUserList() {
         return userDao.findAll();
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 根据注册时间获取用户,从lt到rt
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 根据注册时间获取用户, 从lt到rt
+     **/
     @Override
     public List<User> getUsersBySignUpTime(String lt, String rt) {
         Query query = new Query();
@@ -436,10 +459,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 修改用户状态
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/18
+     * @Description: 修改用户状态
+     **/
     @Override
     public void changeUserStatus(String uid, Integer status) {
         Update update = new Update();
@@ -453,22 +476,22 @@ public class UserServiceImpl implements UserService {
     public HashMap<String, Object> searchUser(SearchRequestVo requestVo, String uid) {
         Query query = new Query();
         query.addCriteria(
-                        Criteria.where(requestVo.getType()).regex(Pattern.compile("^.*" + requestVo.getSearchContent() + ".*$", Pattern.CASE_INSENSITIVE))
-                                .and("uid").ne(uid)
-                ).with(Sort.by(Sort.Direction.DESC, "_id"))
+                Criteria.where(requestVo.getType()).regex(Pattern.compile("^.*" + requestVo.getSearchContent() + ".*$", Pattern.CASE_INSENSITIVE))
+                        .and("uid").ne(uid)
+        ).with(Sort.by(Sort.Direction.DESC, "_id"))
                 .skip((long) (requestVo.getPageIndex() - 1) * requestVo.getPageSize())
                 .limit(requestVo.getPageSize());
         Query query1 = new Query();
 
         query1.addCriteria(
-                        Criteria.where(requestVo.getType()).regex(Pattern.compile("^.*" + requestVo.getSearchContent() + ".*$", Pattern.CASE_INSENSITIVE))
-                                .and("uid").ne(uid)
-                );
+                Criteria.where(requestVo.getType()).regex(Pattern.compile("^.*" + requestVo.getSearchContent() + ".*$", Pattern.CASE_INSENSITIVE))
+                        .and("uid").ne(uid)
+        );
         long count = mongoTemplate.count(query1, User.class);
         HashMap<String, Object> map = new HashMap<String, Object>();
         List<User> users = mongoTemplate.find(query, User.class);
-        map.put("total",count);
-        map.put("list",users);
+        map.put("total", count);
+        map.put("list", users);
         return map;
     }
 

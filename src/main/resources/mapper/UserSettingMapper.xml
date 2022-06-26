@@ -5,15 +5,15 @@
 <mapper namespace="com.ice.chatserver.mapper.UserSettingMapper">
 
     <resultMap id="BaseResultMap" type="com.ice.chatserver.pojo.UserSetting">
-            <id property="id" column="id" jdbcType="INTEGER"/>
-            <result property="userId" column="user_id" jdbcType="INTEGER"/>
-            <result property="primaryColor" column="primary_color" jdbcType="VARCHAR"/>
-            <result property="backgroundColor" column="background_color" jdbcType="VARCHAR"/>
-            <result property="chatTop" column="chat_top" jdbcType="VARCHAR"/>
-            <result property="publicStatus" column="public_status" jdbcType="INTEGER"/>
-            <result property="notifyStatus" column="notify_status" jdbcType="INTEGER"/>
-            <result property="volume" column="volume" jdbcType="INTEGER"/>
-            <result property="messageNotify" column="message_notify" jdbcType="INTEGER"/>
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="primaryColor" column="primary_color" jdbcType="VARCHAR"/>
+        <result property="backgroundColor" column="background_color" jdbcType="VARCHAR"/>
+        <result property="chatTop" column="chat_top" jdbcType="VARCHAR"/>
+        <result property="publicStatus" column="public_status" jdbcType="INTEGER"/>
+        <result property="notifyStatus" column="notify_status" jdbcType="INTEGER"/>
+        <result property="volume" column="volume" jdbcType="INTEGER"/>
+        <result property="messageNotify" column="message_notify" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">

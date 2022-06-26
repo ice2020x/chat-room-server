@@ -78,4 +78,8 @@ public class User {
     };
     //好友备注信息,好友id为key
     private Map<String, String> friendBeiZhu = new HashMap<>();
+    // 是否是我的朋友
+    private boolean myFriend;
+    // 是否是他的朋友
+    private boolean hisFriend;
 }

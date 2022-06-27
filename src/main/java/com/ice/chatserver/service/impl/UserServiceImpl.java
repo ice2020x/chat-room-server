@@ -154,9 +154,9 @@ public class UserServiceImpl implements UserService {
         final String currentUserId = getUserId(request);
         if (user != null) {
             if (StringUtils.isNoneBlank(currentUserId)) {
-                final long count = mongoTemplate.count(new Query().addCriteria(Criteria.where("userM").is(currentUserId).and("userY").is(userId)), Integer.class);
+                final long count = mongoTemplate.count(new Query().addCriteria(Criteria.where("userM").is(currentUserId).and("userY").is(userId)),"goodfriends");
                 user.setMyFriend(count > 0);
-                final long count2 = mongoTemplate.count(new Query().addCriteria(Criteria.where("userY").is(currentUserId).and("userM").is(userId)), Integer.class);
+                final long count2 = mongoTemplate.count(new Query().addCriteria(Criteria.where("userY").is(currentUserId).and("userM").is(userId)),"goodfriends");
                 user.setMyFriend(count2 > 0);
             }
             return R.ok().data("user", user).message("获取用户详细信息成功");

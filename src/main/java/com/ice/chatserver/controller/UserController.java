@@ -7,6 +7,8 @@ import com.ice.chatserver.pojo.config.JwtInfo;
 import com.ice.chatserver.pojo.vo.*;
 import com.ice.chatserver.service.UserService;
 import com.ice.chatserver.utils.JwtUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,9 +81,11 @@ public class UserController {
      **/
     @PostMapping("/updateFriendBeiZhu")
     public R modifyFriendBeiZhu(@RequestBody ModifyFriendBeiZhuRequestVo requestVo, HttpServletRequest request) {
-        JwtInfo infoByJwtToken = JwtUtils.getInfoByJwtToken(request);
-        String userId = infoByJwtToken.getUserId();
-        return userService.modifyFriendBeiZhu(requestVo, userId);
+        String currentUserId = JwtUtils.getCurrentUserId(request);
+        if (currentUserId == null) {
+            throw new RuntimeException("用户未登录");
+        }
+        return userService.modifyFriendBeiZhu(requestVo, currentUserId);
     }
 
     /**
@@ -134,7 +138,8 @@ public class UserController {
     }
 
     @PostMapping("/updateUserInfo")
-    public R updateUserInfo(@RequestBody UpdateUserInfoRequestVo requestVo) {
+    public R updateUserInfo(@RequestBody UpdateUserInfoRequestVo requestVo,HttpServletRequest request) {
+        String userId = getUserId(request);
         Map<String, Object> resMap = userService.updateUserInfo(requestVo);
         if (resMap.size() > 0) {
             return R.error().code((Integer) resMap.get("code")).message((String) resMap.get("msg"));
@@ -171,6 +176,16 @@ public class UserController {
         System.out.println("搜索的用户信息返回的结果为：" + userList);
         return R.ok().data(userList);
     }
-
-
+    
+    private String getUserId(HttpServletRequest request) {
+        JwtInfo infoByJwtToke = JwtUtils.getInfoByJwtToken(request);
+        if (ObjectUtils.isEmpty(infoByJwtToke)) {
+            throw new RuntimeException("用户未登录");
+        }
+        final String userId = infoByJwtToke.getUserId();
+        if (StringUtils.isBlank(userId)) {
+            throw new RuntimeException("用户未登录");
+        }
+        return userId;
+    }
 }

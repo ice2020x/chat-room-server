@@ -14,17 +14,17 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+
 /**
- * @author Agitator
- * @date 2022.06.26
- * @description 用户设置
+ * 用户设置
  */
 @RequestMapping("/user/setting")
 @RestController
 public class UserSettingController {
     @Resource
     UserSettingService userSettingService;
-
+    
+    //获取当前用户设置
     @GetMapping("/")
     public R getCurrentUserSetting(HttpServletRequest request) {
         final String userId = getUserId(request);
@@ -38,7 +38,8 @@ public class UserSettingController {
         }
         return R.ok().data("setting", userSetting);
     }
-
+    
+    //更新当前用户设置
     @PutMapping("/update")
     public R updateCurrentUserSetting(HttpServletRequest request, @RequestBody UserSetting userSetting) {
         final String userId = getUserId(request);
@@ -52,7 +53,8 @@ public class UserSettingController {
         userSettingService.update(userSetting, new UpdateWrapper<UserSetting>().eq("user_id", userId));
         return R.ok().data("setting", userSetting);
     }
-
+    
+    //获取当前用户ID
     private String getUserId(HttpServletRequest request) {
         JwtInfo infoByJwtToke = JwtUtils.getInfoByJwtToken(request);
         if (ObjectUtils.isEmpty(infoByJwtToke)) {
@@ -64,5 +66,4 @@ public class UserSettingController {
         }
         return userId;
     }
-
 }

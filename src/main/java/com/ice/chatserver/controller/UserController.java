@@ -140,6 +140,7 @@ public class UserController {
     @PostMapping("/updateUserInfo")
     public R updateUserInfo(@RequestBody UpdateUserInfoRequestVo requestVo,HttpServletRequest request) {
         String userId = getUserId(request);
+        requestVo.setUserId(userId);
         Map<String, Object> resMap = userService.updateUserInfo(requestVo);
         if (resMap.size() > 0) {
             return R.error().code((Integer) resMap.get("code")).message((String) resMap.get("msg"));

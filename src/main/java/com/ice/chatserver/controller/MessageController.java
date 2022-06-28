@@ -8,6 +8,7 @@ import com.ice.chatserver.pojo.vo.*;
 import com.ice.chatserver.service.*;
 import com.ice.chatserver.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +57,7 @@ public class MessageController {
         List<MessageListVo> messageListVos = new ArrayList<MessageListVo>();
         for (MyGroupResultVo myGroupResultVo : myGroupList) {
             GroupMessageResultVo groupLastMessage = groupMessageService.getGroupLastMessage(myGroupResultVo.getGroupId());
-            if (groupLastMessage != null) {
+            if (groupLastMessage != null&& StringUtils.isNoneBlank(groupLastMessage.getMessage())) {
                 MessageListVo messageListVo = new MessageListVo();
                 messageListVo.setLastMessage(groupLastMessage.getMessage());
                 messageListVo.setId(groupLastMessage.getRoomId());
@@ -82,7 +83,7 @@ public class MessageController {
                 messageListVo.setId(lastMessage.getRoomId());
                 String roomId = lastMessage.getRoomId();
                 String userId = infoByJwtToke.getUserId();
-                String replace = roomId.replace(userId, "");
+                String replace = roomId.replace(userId, "").replace("-","");
                 User user = userDao.findById(new ObjectId(replace)).orElse(null);
                 assert user != null;
                 messageListVo.setNickname(user.getNickname());

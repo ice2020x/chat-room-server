@@ -353,7 +353,7 @@ public class UserServiceImpl implements UserService {
         boolean flag = false;
         //需要特别判断数字型字段，否则查询的时候会出错
         if (requestVo.getField().equals("sex")) {
-            String sexStr = (String) requestVo.getValue();
+            String sexStr = requestVo.getValue().toString();
             //非数字
             if (!ChatServerUtil.isNumeric(sexStr)) {
                 code = ResultEnum.ERROR_SETTING_GENDER.getCode();

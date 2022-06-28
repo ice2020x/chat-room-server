@@ -54,7 +54,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 Aggregation.lookup(
                         "users",
                         "userY",
-                        "uid",
+                        "_id",
                         "uList"
                 )
         );
@@ -63,7 +63,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 Aggregation.lookup(
                         "users",
                         "userM",
-                        "uid",
+                        "_id",
                         "uList"
                 )
         );
@@ -84,7 +84,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 item.setSignature(son.getUList().get(0).getSignature());
                 item.setId(son.getUList().get(0).getUserId().toString());
                 item.setLevel(computedLevel(son.getUList().get(0).getOnlineTime()));
-                item.setRoomId(userId+son.getUList().get(0).getUserId().toString());
+                item.setRoomId(userId+"-"+son.getUList().get(0).getUserId().toString());
                 resList.add(item);
             }
         }
@@ -97,7 +97,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 item.setSignature(son.getUList().get(0).getSignature());
                 item.setId(son.getUList().get(0).getUserId().toString());
                 item.setLevel(computedLevel(son.getUList().get(0).getOnlineTime()));
-                item.setRoomId(son.getUList().get(0).getUserId().toString()+userId);
+                item.setRoomId(son.getUList().get(0).getUserId().toString()+"-"+userId);
                 resList.add(item);
             }
         }

@@ -276,7 +276,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
     private void modifyNewUserFenZu(String uid, String friendId) {
         User userInfo = getUser(uid);
         Map<String, ArrayList<String>> friendFenZuMap = userInfo.getFriendFenZu();
-        friendFenZuMap.get("我的好友").add(friendId);
+        friendFenZuMap.get("bestFriend").add(friendId);
         //更新用户信息
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(new ObjectId(uid)));

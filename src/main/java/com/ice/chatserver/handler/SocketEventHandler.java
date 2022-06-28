@@ -265,29 +265,34 @@ public class SocketEventHandler {
     @OnEvent("sendAgreeFriendValidate")
     public void sendAgreeFriendValidate(SocketIOClient client, ValidateMessageResponseVo validateMessage) {
         log.info("sendAgreeFriendValidate -------------> validateMessage：{}", validateMessage);
-        GoodFriend goodFriend = new GoodFriend();
-        goodFriend.setUserM(new ObjectId(validateMessage.getSenderId()));
-        goodFriend.setUserY(new ObjectId(validateMessage.getReceiverId()));
-        goodFriendService.addFriend(goodFriend);
-
-        // 用户同意加好友之后改变验证消息的状态
-        validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 1);
-        //原本是接收者房间
-        String roomId = validateMessage.getRoomId();
-        //接收者
-        String receiverId = validateMessage.getReceiverId();
-        //发送者
-        String senderId = validateMessage.getSenderId();
-        //把接受者id替换为发送者id回到同意加好友的这方房间去更新我的好友列表
-        String senderRoomId = roomId.replaceAll(receiverId, senderId);
-        //向roomId传送验证消息，不再通知接收者房间里的客户端，因为前端通过eventbus处理了
-        //实际上同一房间只有2个客户端
-        Collection<SocketIOClient> clients = socketIOServer.getRoomOperations(senderRoomId).getClients();
-        for (SocketIOClient item : clients) {
-            if (item != client) {
-                //通知发送者房间，除了当前客户端
-                item.sendEvent("receiveAgreeFriendValidate", validateMessage);
+        try {
+            GoodFriend goodFriend = new GoodFriend();
+            goodFriend.setUserM(new ObjectId(validateMessage.getSenderId()));
+            goodFriend.setUserY(new ObjectId(validateMessage.getReceiverId()));
+            goodFriendService.addFriend(goodFriend);
+    
+            // 用户同意加好友之后改变验证消息的状态
+            validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 1);
+            //原本是接收者房间
+            String roomId = validateMessage.getRoomId();
+            //接收者
+            String receiverId = validateMessage.getReceiverId();
+            //发送者
+            String senderId = validateMessage.getSenderId();
+            //把接受者id替换为发送者id回到同意加好友的这方房间去更新我的好友列表
+            String senderRoomId = roomId.replaceAll(receiverId, senderId);
+            //向roomId传送验证消息，不再通知接收者房间里的客户端，因为前端通过eventbus处理了
+            //实际上同一房间只有2个客户端
+            Collection<SocketIOClient> clients = socketIOServer.getRoomOperations(senderRoomId).getClients();
+            for (SocketIOClient item : clients) {
+                if (item != client) {
+                    //通知发送者房间，除了当前客户端
+                    item.sendEvent("receiveAgreeFriendValidate", validateMessage);
+                }
             }
+            client.sendEvent("sendAgreeFriendValidate", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+        } catch (Exception e) {
+            client.sendEvent("sendAgreeFriendValidate", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
         }
     }
 
@@ -299,7 +304,12 @@ public class SocketEventHandler {
     @OnEvent("sendDisAgreeFriendValidate")
     public void sendDisAgreeFriendValidate(SocketIOClient client, ValidateMessageResponseVo validateMessage) {
         log.info("sendDisAgreeFriendValidate ---> validateMessage：{}", validateMessage);
-        validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 2);
+        try {
+            validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 2);
+            client.sendEvent("sendDisAgreeFriendValidate", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+        } catch (Exception e) {
+            client.sendEvent("sendDisAgreeFriendValidate", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+        }
     }
 
     /**

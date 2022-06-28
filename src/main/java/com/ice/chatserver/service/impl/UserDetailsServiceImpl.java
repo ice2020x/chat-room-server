@@ -11,20 +11,16 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 13:03
- * @description:
- */
+//用户详情实现类
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     @Resource
     private UserDao userDao;
-
+    
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = userDao.findUserByUsernameOrCode(s, s);
-         System.out.println("查询到的登录用户信息为：" + user);
+        System.out.println("查询到的登录用户信息为：" + user);
         if (user == null) {
             throw new UsernameNotFoundException("该用户不存在！");
         }

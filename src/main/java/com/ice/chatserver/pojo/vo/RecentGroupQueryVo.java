@@ -1,6 +1,5 @@
 package com.ice.chatserver.pojo.vo;
 
-
 import com.ice.chatserver.pojo.Group;
 import lombok.AllArgsConstructor;
 import lombok.Data;

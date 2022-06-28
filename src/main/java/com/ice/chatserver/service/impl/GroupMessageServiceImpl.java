@@ -20,25 +20,17 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * @author ice2020x
- * @date 2021-12-19 14:32
- * @description: 群消息的逻辑实现类
- */
+//群消息的逻辑实现类
 @Service
 public class GroupMessageServiceImpl implements GroupMessageService {
-
+    
     @Resource
     private MongoTemplate mongoTemplate;
-
+    
     @Autowired
     GroupMessageDao groupMessageDao;
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 获取最近的群消息
-     **/
+    
+    //获取最近的群消息
     @Override
     public List<GroupMessageResultVo> getRecentGroupMessages(String roomId, Integer pageIndex, Integer pageSize) {
         Query query = new Query();
@@ -48,17 +40,12 @@ public class GroupMessageServiceImpl implements GroupMessageService {
                 .limit(pageSize);
         return mongoTemplate.find(query, GroupMessageResultVo.class, "groupmessages");
     }
-
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 获取群历史消息
-     **/
+    
+    //获取群历史消息
     @Override
     public GroupHistoryResultVo getGroupHistoryMessages(HistoryMsgRequestVo groupHistoryVo) {
         // 创建复合查询对象
-        System.out.println("groupHistoryVo:"+groupHistoryVo);
+        System.out.println("groupHistoryVo:" + groupHistoryVo);
         Criteria cri1 = new Criteria();
         cri1.and("roomId").is(groupHistoryVo.getRoomId());
         //若查询条件是全部，则模糊匹配 message 或者 fileRawName
@@ -68,7 +55,8 @@ public class GroupMessageServiceImpl implements GroupMessageService {
             //若查询类型是文件或图片，则模糊匹配原文件名
             cri1.and("messageType").is(groupHistoryVo.getType())
                     .and("fileRawName").regex(Pattern.compile("^.*" + groupHistoryVo.getQuery() + ".*$", Pattern.CASE_INSENSITIVE));
-        } else {
+        }
+        else {
             cri2 = new Criteria().orOperator(Criteria.where("message").regex(Pattern.compile("^.*" + groupHistoryVo.getQuery() + ".*$", Pattern.CASE_INSENSITIVE)),
                     Criteria.where("fileRawName").regex(Pattern.compile("^.*" + groupHistoryVo.getQuery() + ".*$", Pattern.CASE_INSENSITIVE)));
         }
@@ -85,7 +73,8 @@ public class GroupMessageServiceImpl implements GroupMessageService {
         if (cri2 != null) {
             //最后两者是且的关系
             query.addCriteria(new Criteria().andOperator(cri1, cri2));
-        } else {
+        }
+        else {
             query.addCriteria(cri1);
         }
         // 统计总数
@@ -98,14 +87,8 @@ public class GroupMessageServiceImpl implements GroupMessageService {
         List<GroupMessageResultVo> messageList = mongoTemplate.find(query, GroupMessageResultVo.class, "groupmessages");
         return new GroupHistoryResultVo(messageList, count);
     }
-
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 获取群的最后以一消息
-    **/
+    
+    //获取群的最后一条消息
     @Override
     public GroupMessageResultVo getGroupLastMessage(String roomId) {
         Query query = new Query();
@@ -117,15 +100,10 @@ public class GroupMessageServiceImpl implements GroupMessageService {
         }
         return res;
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 添加一条群消息
-    **/
+    
+    //添加一条群消息
     @Override
     public void addNewGroupMessage(GroupMessage groupMessage) {
         groupMessageDao.save(groupMessage);
     }
-
 }

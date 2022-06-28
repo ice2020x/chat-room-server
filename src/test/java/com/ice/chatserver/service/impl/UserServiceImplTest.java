@@ -10,15 +10,14 @@ import java.util.HashMap;
 
 @SpringBootTest
 class UserServiceImplTest {
-
     @Autowired
     private UserService userService;
-
+    
     @Test
     void searchUser() {
-
+        
         SearchRequestVo searchRequestVo = new SearchRequestVo();
-
+        
         searchRequestVo.setSearchContent("伊瓜");
         searchRequestVo.setType("nickname");
         searchRequestVo.setPageIndex(0);
@@ -27,6 +26,5 @@ class UserServiceImplTest {
         for (String s : stringObjectHashMap.keySet()) {
             System.out.println(stringObjectHashMap.get(s));
         }
-
     }
 }

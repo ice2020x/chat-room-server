@@ -8,11 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-/**
-* @author ice2020x
-* @Date: 2021/12/18
-* @Description: 群聊的成员信息
-**/
 @Data
 @NoArgsConstructor
 @Document("groupusers")

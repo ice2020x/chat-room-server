@@ -5,16 +5,11 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 17:17
- * @description:
- */
 @Data
 @ToString
 @Document(collection = "filesystem")
 public class FileSystem {
-
+    
     @Id
     private String fileId;
     //文件请求路径

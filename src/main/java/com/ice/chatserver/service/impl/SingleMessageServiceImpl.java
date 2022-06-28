@@ -21,24 +21,15 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * @author ice2020x
- * @date 2021-12-19 15:04
- * @description:
- */
+//单聊
 @Service
 public class SingleMessageServiceImpl implements SingleMessageService {
-
     @Resource
     private SingleMessageDao singleMessageDao;
     @Resource
     private MongoTemplate mongoTemplate;
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 返回最后一条消息
-    **/
+    
+    //获取最后一条消息
     @Override
     public SingleMessageResultVo getLastMessage(String roomId) {
         Query query = new Query();
@@ -53,8 +44,7 @@ public class SingleMessageServiceImpl implements SingleMessageService {
         }
         return message;
     }
-
-
+    
     @Override
     public SingleMessageResultVo getLastMessageOrNull(String roomId) {
         Query query = new Query();
@@ -62,29 +52,20 @@ public class SingleMessageServiceImpl implements SingleMessageService {
                 .with(Sort.by(Sort.Direction.DESC, "_id"));
         return mongoTemplate.findOne(query, SingleMessageResultVo.class, "singlemessages");
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 获取好友间的单聊信息
-    **/
+    
+    
+    //获取好友间的单聊信息
     @Override
     public List<SingleMessageResultVo> getRecentMessage(String roomId, Integer pageIndex, Integer pageSize) {
         Query query = new Query();
         query.addCriteria(Criteria.where("roomId").is(roomId))
                 .with(Sort.by(Sort.Direction.DESC, "_id"))
-                .skip((long) pageIndex * pageSize)
+                .skip((long) (pageIndex - 1) * pageSize)
                 .limit(pageSize);
         return mongoTemplate.find(query, SingleMessageResultVo.class, "singlemessages");
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 修改状态标记已经读了
-    **/
+    
+    //修改状态标记为已读
     @Override
     public void userIsReadMessage(IsReadMessageRequestVo ivo) {
         Update update = new Update();
@@ -93,12 +74,8 @@ public class SingleMessageServiceImpl implements SingleMessageService {
         query.addCriteria(Criteria.where("roomId").is(ivo.getRoomId()));
         mongoTemplate.updateMulti(query, update, "singlemessages");
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 获取单聊的历史记录
-    **/
+    
+    //获取单聊的历史记录
     @Override
     public SingleHistoryResultVo getSingleHistoryMsg(HistoryMsgRequestVo historyMsgRequestVo) {
         Criteria cri1 = new Criteria();
@@ -110,7 +87,8 @@ public class SingleMessageServiceImpl implements SingleMessageService {
             //若查询类型是文件或图片，则模糊匹配原文件名
             cri1.and("messageType").is(historyMsgRequestVo.getType())
                     .and("fileRawName").regex(Pattern.compile("^.*" + historyMsgRequestVo.getQuery() + ".*$", Pattern.CASE_INSENSITIVE));
-        } else {
+        }
+        else {
             cri2 = new Criteria().orOperator(Criteria.where("message").regex(Pattern.compile("^.*" + historyMsgRequestVo.getQuery() + ".*$", Pattern.CASE_INSENSITIVE)),
                     Criteria.where("fileRawName").regex(Pattern.compile("^.*" + historyMsgRequestVo.getQuery() + ".*$", Pattern.CASE_INSENSITIVE)));
         }
@@ -126,7 +104,8 @@ public class SingleMessageServiceImpl implements SingleMessageService {
         Query query = new Query();
         if (cri2 != null) {
             query.addCriteria(new Criteria().andOperator(cri1, cri2));
-        } else {
+        }
+        else {
             query.addCriteria(cri1);
         }
         // 统计总数
@@ -140,12 +119,8 @@ public class SingleMessageServiceImpl implements SingleMessageService {
         List<SingleMessageResultVo> messageList = mongoTemplate.find(query, SingleMessageResultVo.class, "singlemessages");
         return new SingleHistoryResultVo(messageList, total);
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 添加一条单人记录
-    **/
+    
+    //添加一条单聊记录
     @Override
     public void addNewSingleMessage(SingleMessage message) {
         singleMessageDao.save(message);

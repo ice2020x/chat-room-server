@@ -19,22 +19,17 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 19:49
- * @description:
- */
+//系统逻辑实现类
 @Service
 public class SystemServiceImpl implements SystemService {
-
+    
     @Resource
     private MongoTemplate mongoTemplate;
-
+    
     @Autowired
     SysDao sysDao;
-    /**
-     * 项目一启动就检查一下
-     */
+    
+    //项目一启动自动检查
     @Override
     public void notExistThenAddSystemUser(SystemUser user) {
         Query query = new Query();
@@ -44,12 +39,8 @@ public class SystemServiceImpl implements SystemService {
             sysDao.save(user);
         }
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 获取系统用户列表
-    **/
+    
+    //获取系统用户列表
     @Override
     public List<SystemUserResponseVo> getSysUsers() {
         List<SystemUser> systemUsers = sysDao.findAll();
@@ -63,38 +54,26 @@ public class SystemServiceImpl implements SystemService {
         }
         return res;
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 添加一个反馈信息
-    **/
+    
+    //新增反馈
     @Override
     public void addFeedBack(FeedBack feedBack) {
         mongoTemplate.insert(feedBack, "feedbacks");
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 添加一个敏感消息
-    **/
+    
+    //添加敏感消息
     @Override
     public void addSensitiveMessage(SensitiveMessage sensitiveMessage) {
         mongoTemplate.insert(sensitiveMessage, "sensitivemessages");
     }
-
+    
+    //获取敏感消息列表
     @Override
     public List<SensitiveMessageResultVo> getSensitiveMessageList() {
         return mongoTemplate.findAll(SensitiveMessageResultVo.class, "sensitivemessages");
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 获取反馈列表
-    **/
+    
+    //获取反馈列表
     @Override
     public List<FeedBackResultVo> getFeedbackList() {
         return mongoTemplate.findAll(FeedBackResultVo.class, "feedbacks");

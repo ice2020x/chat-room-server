@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum ResultEnum {
-
     SUCCESS(2000, "成功"),
     ERROR(2001, "失败"),
     ACCOUNT_IS_FROZEN_OR_CANCELLED(1200, "账号被冻结或注销"),
@@ -25,21 +24,20 @@ public enum ResultEnum {
     ERROR_SETTING_GENDER(1012, "设置性别错误，必须为纯数字"),
     ERROR_SETTING_AGE(1012, "设置年龄错误，必须为纯数字"),
     ERROR_SETTING_EMAIL(1013, "设置邮箱错误"),
-    PHONE_EMPTY(1014,"手机号码为空"),
-    LOGIN_PHONE_ERROR(1015,"手机号码错误"),
-    SMS_SEND_ERROR(1016,"短信发送错误"),
-    CODE_ERROR(1017,"验证码错误"),
+    PHONE_EMPTY(1014, "手机号码为空"),
+    LOGIN_PHONE_ERROR(1015, "手机号码错误"),
+    SMS_SEND_ERROR(1016, "短信发送错误"),
+    CODE_ERROR(1017, "验证码错误"),
     ILLEGAL_OPERATION(4001, "非法操作");
-
-
+    
     private Integer code;
     private String message;
-
+    
     ResultEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }
-
+    
     public static ResultEnum parse(int code) {
         ResultEnum[] values = values();
         for (ResultEnum value : values) {

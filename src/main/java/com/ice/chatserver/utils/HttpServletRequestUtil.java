@@ -1,6 +1,5 @@
 package com.ice.chatserver.utils;
 
-
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.ServletRequest;
@@ -8,9 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public class HttpServletRequestUtil {
-
+    
     public static String getBodyTxt(ServletRequest request, String name) throws IOException {
-
         BufferedReader br = request.getReader();
         String str;
         StringBuilder wholeStr = new StringBuilder();

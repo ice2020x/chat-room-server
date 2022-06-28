@@ -16,69 +16,41 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 12:46
- * @Description: 用户的控制器
- */
+//用户控制器
 @RequestMapping("/user")
 @RestController
 @CrossOrigin
 public class UserController {
-
     @Resource
     UserService userService;
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2022/6/14
-    * @Description:
-    **/
+    
+    //获取图像验证码
     @GetMapping("/getCode")
     public R getVerificationCode(HttpServletRequest request, HttpServletResponse response) {
         return userService.getVerificationCode(request, response);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/18
-     * @Description: 注册
-     **/
+    
+    //注册账号
     @PostMapping("/register")
     public R register(@RequestBody RegisterRequestVo rVo) {
         return userService.register(rVo);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/20
-     * @Description: 根据用户id获取用户详细信息
-     **/
+    
+    //根据用户id获取用户详细信息
     @GetMapping("/getUserInfo/{uid}")
-    public R getUserInfo(@PathVariable("uid") String uid,HttpServletRequest request) {
-        return userService.getUserInfo(uid,request);
+    public R getUserInfo(@PathVariable("uid") String uid, HttpServletRequest request) {
+        return userService.getUserInfo(uid, request);
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/20
-    * @Description: 添加分组
-    **/
+    
+    //添加分组
     @PostMapping("/addFenZu")
     public R addNewFenZu(@RequestBody NewFenZuRequestVo requestVo) {
         return userService.addNewFenZu(requestVo);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/18
-     * @Description: 修改备注信息
-     **/
+    
+    //修改好友备注
     @PostMapping("/updateFriendBeiZhu")
     public R modifyFriendBeiZhu(@RequestBody ModifyFriendBeiZhuRequestVo requestVo, HttpServletRequest request) {
         String currentUserId = JwtUtils.getCurrentUserId(request);
@@ -87,97 +59,78 @@ public class UserController {
         }
         return userService.modifyFriendBeiZhu(requestVo, currentUserId);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/18
-     * @Description: 修改好友分组成功
-     **/
+    
+    //修改好友分组
     @PostMapping("/modifyFriendFenZu")
     public R modifyFriendFenZu(@RequestBody ModifyFriendFenZuRequestVo requestVo) {
         return userService.modifyFriendFenZu(requestVo);
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/20
-    * @Description: 删除分组
-    **/
+    
+    //删除分组
     @DeleteMapping("/delFenZu")
     public R deleteFenZu(@RequestBody DelFenZuRequestVo requestVo) {
         return userService.deleteFenZu(requestVo);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/18
-     * @Description: 更新分组名
-     **/
+    
+    //修改分组名
     @PostMapping("/editFenZuName")
     public R editFenZu(@RequestBody EditFenZuRequestVo requestVo) {
         return userService.editFenZu(requestVo);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/18
-     * @Description: 更新用户的配置信息
-     **/
+    
+    //修改用户的个性化设置
     @PostMapping("/updateUserConfigure")
-    public R updateUserConfigure(@RequestBody UpdateUserConfigureRequestVo requestVo,HttpServletRequest request) {
-
+    public R updateUserConfigure(@RequestBody UpdateUserConfigureRequestVo requestVo, HttpServletRequest request) {
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean res = userService.updateUserConfigure(requestVo, userId);
         if (res) {
             //同时携带用户信息去更新全局的用户信息
-            User userInfo = (User) userService.getUserInfo(userId,request).getData().get("user");
+            User userInfo = (User) userService.getUserInfo(userId, request).getData().get("user");
             return R.ok().data("userInfo", userInfo);
-        } else {
+        }
+        else {
             return R.error();
         }
     }
-
+    
+    //更新用户信息
     @PostMapping("/updateUserInfo")
-    public R updateUserInfo(@RequestBody UpdateUserInfoRequestVo requestVo,HttpServletRequest request) {
+    public R updateUserInfo(@RequestBody UpdateUserInfoRequestVo requestVo, HttpServletRequest request) {
         String userId = getUserId(request);
         requestVo.setUserId(userId);
         Map<String, Object> resMap = userService.updateUserInfo(requestVo);
         if (resMap.size() > 0) {
             return R.error().code((Integer) resMap.get("code")).message((String) resMap.get("msg"));
-        } else {
+        }
+        else {
             return R.ok().message("修改成功");
         }
     }
-
-
-
+    
+    //更改密码
     @PostMapping("/updateUserPwd")
     public R updateUserPwd(@RequestBody UpdateUserPwdRequestVo requestVo) {
-        // System.out.println("更新密码的请求参数为：" + requestVo);
         Map<String, Object> resMap = userService.updateUserPwd(requestVo);
         Integer code = (Integer) resMap.get("code");
         if (code.equals(ResultEnum.SUCCESS.getCode())) {
             return R.ok().message((String) resMap.get("msg"));
-        } else {
+        }
+        else {
             return R.error().code(code).message((String) resMap.get("msg"));
         }
     }
-
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/20
-     * @Description: 客户端搜索
-     **/
+    
+    //搜索用户
     @PostMapping("/preFetchUser")
-    public R searchUser(@RequestBody SearchRequestVo requestVo,HttpServletRequest request) {
+    public R searchUser(@RequestBody SearchRequestVo requestVo, HttpServletRequest request) {
         JwtInfo infoByJwtToken = JwtUtils.getInfoByJwtToken(request);
         String userId = infoByJwtToken.getUserId();
-        HashMap<String,Object> userList = userService.searchUser(requestVo, userId);
+        HashMap<String, Object> userList = userService.searchUser(requestVo, userId);
         System.out.println("搜索的用户信息返回的结果为：" + userList);
         return R.ok().data(userList);
     }
     
+    //获取当前登录的用户的uid
     private String getUserId(HttpServletRequest request) {
         JwtInfo infoByJwtToke = JwtUtils.getInfoByJwtToken(request);
         if (ObjectUtils.isEmpty(infoByJwtToke)) {

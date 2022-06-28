@@ -6,10 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
-* @author ice2020x
-* @Date: 2021/12/18
-* @Description: 统一异常处理类
-**/
+ * 统一异常处理类
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class GlobalException extends RuntimeException {
     private Integer code;
     private String message;
-
+    
     public GlobalException(ResultEnum resultEnum) {
         this.code = resultEnum.getCode();
         this.message = resultEnum.getMessage();

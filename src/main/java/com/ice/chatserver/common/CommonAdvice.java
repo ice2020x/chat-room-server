@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class CommonAdvice {
     private static Logger logger = LoggerFactory.getLogger(CommonAdvice.class);
-
+    
     /**
      * 原始异常处理
      */
@@ -27,8 +27,8 @@ public class CommonAdvice {
         return R.error().code((HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .message(e.getMessage());
     }
-
-
+    
+    
     /**
      * 自定义全局异常处理
      */

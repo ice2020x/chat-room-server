@@ -11,11 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
-/**
-* @author ice2020x
-* @Date: 2021/12/18
-* @Description: 描述谁和谁为好友
-**/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,11 +18,11 @@ import java.util.Date;
 public class GoodFriend {
     @Id
     private ObjectId id;
-//    请求者
+    //请求者
     private ObjectId userM;
-//    被请求者
+    //被请求者
     private ObjectId userY;
-//    加好友的时间
+    //加好友的时间
     @CreatedDate
     private Date createDate;
     @LastModifiedDate

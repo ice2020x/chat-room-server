@@ -21,28 +21,18 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ice2020x
- * @date 2021-12-19 11:40
- * @description:
- */
 @Service
 public class GroupUserServiceImpl implements GroupUserService {
-
     @Resource
     private MongoTemplate mongoTemplate;
-
+    
     @Autowired
     GroupUserDao groupUserDao;
-
+    
     @Autowired
     GroupMessageDao groupMessageDao;
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 根据用户名获取我的群聊列表
-     **/
+    
+    //根据用户名获取我的群聊列表
     @Override
     public List<MyGroupResultVo> getGroupUsersByUserName(String username) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -54,17 +44,12 @@ public class GroupUserServiceImpl implements GroupUserService {
                         "groupInfo"
                 )
         );
-
+        
         List<MyGroupResultVo> groupusers = mongoTemplate.aggregate(aggregation, "groupusers", MyGroupResultVo.class).getMappedResults();
         return groupusers;
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 获取最近的群聊，根据id列表获取列表而已
-    **/
+    
+    //获取最近的群聊，根据id列表获取列表而已
     @Override
     public List<MyGroupResultVo> getRecentGroup(RecentGroupVo recentGroupVo) {
         List<ObjectId> groupIds = new ArrayList<>();
@@ -85,17 +70,13 @@ public class GroupUserServiceImpl implements GroupUserService {
         for (RecentGroupQueryVo son : groupusers) {
             item = new MyGroupResultVo();
             BeanUtils.copyProperties(son, item);
-//            item.setGroupInfo(son.getGroupList().get(0));
+            //item.setGroupInfo(son.getGroupList().get(0));
             res.add(item);
         }
         return res;
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description:  根据群id去找所有的群成员信息
-    **/
+    
+    //根据群id去找所有的群成员信息
     @Override
     public List<MyGroupResultVo> getGroupUsersByGroupId(String groupId) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -120,7 +101,8 @@ public class GroupUserServiceImpl implements GroupUserService {
         }
         return res;
     }
-
+    
+    //用户加入群聊
     @Override
     public void addNewGroupUser(ValidateMessageResponseVo validateMessage) {
         GroupUser groupUser = groupUserDao.findGroupUserByUserIdAndGroupId(new ObjectId(validateMessage.getSenderId()), new ObjectId(validateMessage.getGroupInfo().getGid()));
@@ -130,7 +112,7 @@ public class GroupUserServiceImpl implements GroupUserService {
             groupUser.setUserId(new ObjectId(validateMessage.getSenderId()));
             groupUser.setUsername(validateMessage.getSenderName());
             groupUserDao.save(groupUser);
-
+            
             Update update = new Update();
             Query query = new Query();
             query.addCriteria(Criteria.where("_id").is(groupUser.getGroupId()));

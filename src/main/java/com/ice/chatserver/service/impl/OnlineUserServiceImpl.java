@@ -10,16 +10,12 @@ import javax.annotation.Resource;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 13:17
- * @description: string 数据结构维护一个 clientId -> user 用 set 维护所有的 uid
- */
+//数据结构维护一个 clientId -> user 用 set 维护所有的 uid
 @Service
 public class OnlineUserServiceImpl implements OnlineUserService {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
-
+    
     @Override
     public void addClientIdToSimpleUser(String clientId, SimpleUser simpleUser) {
         //将客户端id 和 用户信息绑定在一起
@@ -30,38 +26,38 @@ public class OnlineUserServiceImpl implements OnlineUserService {
         String onlineUidSetKey = RedisKeyUtil.getOnlineUidSetKey();
         redisTemplate.opsForSet().add(onlineUidSetKey, simpleUser.getUid());
     }
-
+    
     @Override
     public Set<Object> getOnlineUidSet() {
         String onlineUidSetKey = RedisKeyUtil.getOnlineUidSetKey();
         return redisTemplate.opsForSet().members(onlineUidSetKey);
     }
-
+    
     @Override
     public SimpleUser getSimpleUserByClientId(String clientId) {
         String clientKey = RedisKeyUtil.getClientKey(clientId);
         Object o = redisTemplate.opsForValue().get(clientKey);
         return o == null ? null : (SimpleUser) o;
     }
-
+    
     @Override
     public void removeClientAndUidInSet(String clientId, String uid) {
         // 删除该客户端信息
         String clientKey = RedisKeyUtil.getClientKey(clientId);
         redisTemplate.delete(clientKey);
-
+        
         // 删除在线用户列表的信息
         String onlineUidSetKey = RedisKeyUtil.getOnlineUidSetKey();
         redisTemplate.opsForSet().remove(onlineUidSetKey, uid);
     }
-
+    
     @Override
     public int countOnlineUser() {
         String onlineUidSetKey = RedisKeyUtil.getOnlineUidSetKey();
         Set<Object> members = redisTemplate.opsForSet().members(onlineUidSetKey);
         return members == null ? 0 : members.size();
     }
-
+    
     @Override
     public boolean checkCurUserIsOnline(String uid) {
         String onlineUidSetKey = RedisKeyUtil.getOnlineUidSetKey();

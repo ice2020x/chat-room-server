@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
+//短信验证控制器
 @RestController
 @RequestMapping("/sms")
 public class MsmController {
-
     @Autowired
     private MsmService msmService;
-
+    
+    //发送短信验证码
     @GetMapping("/send/{phone}")
     public R sendMsm(HttpServletRequest request, @PathVariable("phone") String phone) {
         msmService.sendMsg(request, phone);

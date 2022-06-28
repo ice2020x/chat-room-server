@@ -18,13 +18,13 @@ public class ChatServerUtil {
         }
         return DigestUtils.md5DigestAsHex(key.getBytes());
     }
-
+    
     // 生成随机字符串
     public static String generateUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
-
-
+    
+    
     // 生成随机nickname
     public static String randomNickname() {
         int len = ConstValueEnum.nickNameList.length;
@@ -32,7 +32,7 @@ public class ChatServerUtil {
         String res = str2HexStr(new Date().toString());
         return ConstValueEnum.nickNameList[random] + res.substring(res.length() - 2) + random;
     }
-
+    
     //字符串转换成为16进制(无需Unicode编码)
     public static String str2HexStr(String str) {
         char[] chars = "0123456789ABCDEF".toCharArray();
@@ -47,12 +47,12 @@ public class ChatServerUtil {
         }
         return sb.toString().trim();
     }
-
+    
     //判断是否都为数字
     public static boolean isNumeric(String str) {
         return Pattern.compile("[0-9]*").matcher(str).matches();
     }
-
+    
     //验证邮箱
     public static boolean isEmail(String email) {
         /**

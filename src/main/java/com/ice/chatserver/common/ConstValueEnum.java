@@ -4,24 +4,24 @@ public interface ConstValueEnum {
     public static final String FRIEND = "FRIEND";
     public static final String GROUP = "GROUP";
     public static final String VALIDATE = "VALIDATE";
-
-
+    
+    
     public static final Integer USERTYPE = 1; //用户
     public static final Integer GROUPTYPE = 2; //群聊
-
+    
     public static final Integer ACCOUNT_USED = 1; //账号已使用
     public static final Integer ACCOUNT_NOT_USED = 0; //账号未使用
     public static final Integer ACCOUNT_NORMAL = 0; //账号正常
-    public static final Integer ACCOUNT_FREEZED  = 1; //账号冻结不可用
+    public static final Integer ACCOUNT_FREEZED = 1; //账号冻结不可用
     public static final Integer ACCOUNT_CANCELED = 2; //账号注销不可用
-
-
+    
+    
     public static final Long INITIAL_NUMBER = 10000000L;//用户code字段初始值
-
-
+    
+    
     public static final char[] cvCodeList = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
             'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
-
+    
     public static final String[] nickNameList = {
             "C罗", "马塞洛", "梅西", "拉莫斯", "贝尔", "本泽马", "内马尔", "姆巴佩",
             "莱万多夫斯基", "纳瓦斯", "贝克汉姆", "小罗", "大罗", "德布劳内", "莫德里奇", "哈梅斯", "克罗斯",
@@ -33,5 +33,5 @@ public interface ConstValueEnum {
             "孙兴慜", "孙继海", "卡瓦尼", "迪马利亚", "拉基蒂奇", "阿拉巴", "诺伊尔", "博阿滕", "凯恩", "埃里克森",
             "卢卡库", "戈丁", "桑切斯", "迷你罗"
     };
-
+    
 }

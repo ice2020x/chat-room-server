@@ -3,7 +3,6 @@ package com.ice.chatserver.pojo;
 
 import com.ice.chatserver.pojo.config.BrowserSetting;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -16,17 +15,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author ice2020x
- * @Date: 2021/12/18
- * @Description: 用户消息
- **/
 @Data
 @Document(collection = "users")
 public class User {
     public User() {
     }
-
+    
     @Id
     private ObjectId userId;
     //专门用一个字符串来保存用户的uid，对应 userId
@@ -54,7 +48,7 @@ public class User {
     private Integer blur = 10; //模糊度
     private String notifySound = "default"; //提示音
     private String bgColor = "#fff"; //背景颜色
-
+    
     // 注册时间
     @CreatedDate
     private Date signUpTime;
@@ -63,7 +57,7 @@ public class User {
     private Date lastLogin;
     // 0：正常可用，1：冻结不可用，2：注销不可用
     private Integer status = 0;
-
+    
     private Integer age = 18;
     //在线时长
     private Long onlineTime = 0L;

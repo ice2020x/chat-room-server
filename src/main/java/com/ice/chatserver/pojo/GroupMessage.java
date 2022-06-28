@@ -12,11 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
-* @author ice2020x
-* @Date: 2021/12/18
-* @Description: 群聊消息
-**/
 @Data
 @NoArgsConstructor
 @Document("groupmessages")
@@ -33,8 +28,8 @@ public class GroupMessage {
     private String messageType;// 消息的类型：emoji/text/img/file/sys
     // 判断已经读取的用户，在发送消息时默认发送方已读取，判断多少人未读
     private List<String> isReadUser = new ArrayList<>();
-
-//    消息的发送时间
+    
+    //    消息的发送时间
     @CreatedDate
     private Date createDate;
     //    修改时间

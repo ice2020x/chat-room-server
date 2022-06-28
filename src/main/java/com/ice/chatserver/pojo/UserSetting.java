@@ -1,26 +1,18 @@
 package com.ice.chatserver.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
 
-/**
- * @TableName user_setting
- */
 @Data
 public class UserSetting implements Serializable {
-    /**
-     *
-     */
     @TableId(type = IdType.AUTO)
     private Integer id;
     
     /**
-     *
+     * 用户ID
      */
     private String userId;
     
@@ -59,8 +51,5 @@ public class UserSetting implements Serializable {
      */
     private Integer messageNotify;
     
-    
     private static final long serialVersionUID = 1L;
-    
-    
 }

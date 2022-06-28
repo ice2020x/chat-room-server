@@ -6,7 +6,6 @@ import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.ice.chatserver.common.ConstValueEnum;
-import com.ice.chatserver.common.R;
 import com.ice.chatserver.common.SocketR;
 import com.ice.chatserver.common.constant.SocketRConstant;
 import com.ice.chatserver.filter.SensitiveFilter;
@@ -38,35 +37,35 @@ import java.util.Map;
 public class SocketEventHandler {
     @Resource
     private SocketIOServer socketIOServer;
-
+    
     @Resource
     private SystemService sysService;
-
+    
     @Resource
     private GroupUserService groupUserService;
-
+    
     @Resource
     private GoodFriendService goodFriendService;
-
+    
     @Resource
     private ValidateMessageService validateMessageService;
-
+    
     @Resource
     private GroupMessageService groupMessageService;
-
+    
     @Resource
     private SingleMessageService singleMessageService;
-
+    
     @Resource
     private UserService userService;
-
+    
     @Resource
     private SensitiveFilter sensitiveFilter;
-
+    
     @Resource
     private OnlineUserService onlineUserService;
-
-
+    
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -75,11 +74,11 @@ public class SocketEventHandler {
     @OnConnect
     public void eventOnConnect(SocketIOClient client) {
         Map<String, List<String>> urlParams = client.getHandshakeData().getUrlParams();
-        System.out.println("客户端:连接参数"+urlParams);
+        System.out.println("客户端:连接参数" + urlParams);
         System.out.println("客户端唯一标识为：" + client.getSessionId());
         log.info("链接开启，urlParams：{}", urlParams);
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -90,7 +89,7 @@ public class SocketEventHandler {
         log.info("在线用户的信息为：{}", SocketIoServerMapUtil.getUidToUserMap());
         log.info("当前在线用户人数为：{}", onlineUserService.countOnlineUser());
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -106,7 +105,7 @@ public class SocketEventHandler {
         }
         printMessage();
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -123,8 +122,8 @@ public class SocketEventHandler {
         log.info("剩余在线人数：{}", onlineUserService.countOnlineUser());
         socketIOServer.getBroadcastOperations().sendEvent("onlineUser", onlineUserService.getOnlineUidSet());
     }
-
-
+    
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -141,8 +140,8 @@ public class SocketEventHandler {
         //广播所有在线用户
         socketIOServer.getBroadcastOperations().sendEvent("onlineUser", onlineUserService.getOnlineUidSet());
     }
-
-
+    
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -154,12 +153,12 @@ public class SocketEventHandler {
         cleanLoginInfo(client.getSessionId().toString());
         socketIOServer.getBroadcastOperations().sendEvent("onlineUser", onlineUserService.getOnlineUidSet());
     }
-
+    
     /**
-    * @author ice2020x
-    * @Date: 2021/12/20
-    * @Description: 是否读了这个消息
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/20
+     * @Description: 是否读了这个消息
+     **/
     @OnEvent("isReadMsg")
     public void isReadMsg(SocketIOClient client, UserIsReadMsgRequestVo requestVo) {
         log.info("isReadMsg ---> requestVo：{}", requestVo);
@@ -174,14 +173,14 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     @OnEvent("join")
     public void join(SocketIOClient client, CurrentConversationVo conversationVo) {
         log.info("加入房间号码：{} -------------> conversationVo：{}", conversationVo.getRoomId(), conversationVo);
         //当前登录的客户端加入到指定房间
         client.joinRoom(conversationVo.getRoomId());
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -196,7 +195,8 @@ public class SocketEventHandler {
             singleMessage.setSenderId(new ObjectId(newMessageVo.getSenderId()));
             System.out.println("待插入的单聊消息为：" + singleMessage);
             singleMessageService.addNewSingleMessage(singleMessage);
-        } else if (newMessageVo.getConversationType().equals(ConstValueEnum.GROUP)) {
+        }
+        else if (newMessageVo.getConversationType().equals(ConstValueEnum.GROUP)) {
             GroupMessage groupMessage = new GroupMessage();
             BeanUtils.copyProperties(newMessageVo, groupMessage);
             groupMessage.setSenderId(new ObjectId(newMessageVo.getSenderId()));
@@ -206,16 +206,16 @@ public class SocketEventHandler {
         //通知该房间收到消息接受到消息
         //实际上同一房间只有2个客户端
         Collection<SocketIOClient> clients = socketIOServer.getRoomOperations(newMessageVo.getRoomId()).getClients();
-        System.out.println("clients"+clients);
+        System.out.println("clients" + clients);
         for (SocketIOClient item : clients) {
-            System.out.println("item:"+item);
+            System.out.println("item:" + item);
             if (item != client) {
                 log.info("receiveMessage------------->");
                 item.sendEvent("receiveMessage", newMessageVo);
             }
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -251,12 +251,13 @@ public class SocketEventHandler {
                     item.sendEvent("receiveValidateMessage", validateMessage);
                 }
             }
-            client.sendEvent("sendValidateMessage", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
-        } else {
-            client.sendEvent("sendValidateMessage", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+            client.sendEvent("sendValidateMessage", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data", validateMessage));
+        }
+        else {
+            client.sendEvent("sendValidateMessage", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data", validateMessage));
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -270,7 +271,7 @@ public class SocketEventHandler {
             goodFriend.setUserM(new ObjectId(validateMessage.getSenderId()));
             goodFriend.setUserY(new ObjectId(validateMessage.getReceiverId()));
             goodFriendService.addFriend(goodFriend);
-    
+            
             // 用户同意加好友之后改变验证消息的状态
             validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 1);
             //原本是接收者房间
@@ -290,12 +291,12 @@ public class SocketEventHandler {
                     item.sendEvent("receiveAgreeFriendValidate", validateMessage);
                 }
             }
-            client.sendEvent("sendAgreeFriendValidate", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+            client.sendEvent("sendAgreeFriendValidate", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data", validateMessage));
         } catch (Exception e) {
-            client.sendEvent("sendAgreeFriendValidate", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+            client.sendEvent("sendAgreeFriendValidate", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data", validateMessage));
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -306,12 +307,12 @@ public class SocketEventHandler {
         log.info("sendDisAgreeFriendValidate ---> validateMessage：{}", validateMessage);
         try {
             validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 2);
-            client.sendEvent("sendDisAgreeFriendValidate", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+            client.sendEvent("sendDisAgreeFriendValidate", SocketR.ok().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data", validateMessage));
         } catch (Exception e) {
-            client.sendEvent("sendDisAgreeFriendValidate", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data",validateMessage));
+            client.sendEvent("sendDisAgreeFriendValidate", SocketR.error().event(SocketRConstant.EventCode.VALIDATE_MESSAGE).data("data", validateMessage));
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -335,7 +336,7 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -364,7 +365,7 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -375,7 +376,7 @@ public class SocketEventHandler {
         log.info("sendDisAgreeGroupValidate ---> validateMessage：{}", validateMessage);
         validateMessageService.changeFriendValidateNewsStatus(validateMessage.getId(), 2);
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -392,7 +393,7 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -410,7 +411,7 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -428,7 +429,7 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
      * @author ice2020x
      * @Date: 2021/12/19
@@ -446,12 +447,12 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 转发 ICE，选取最佳的链接方式
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 转发 ICE，选取最佳的链接方式
+     **/
     @OnEvent("1v1ICE")
     public void ICE(SocketIOClient client, CurrentConversationVo conversationVo) {
         log.info("1v1ICE -------------> roomId：{}", conversationVo.getRoomId());
@@ -464,12 +465,12 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 转发 Offer
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 转发 Offer
+     **/
     @OnEvent("1v1offer")
     public void offer(SocketIOClient client, CurrentConversationVo conversationVo) {
         log.info("1v1offer -------------> roomId：{}", conversationVo.getRoomId());
@@ -481,12 +482,12 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
     /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 转发 hangup
-    **/
+     * @author ice2020x
+     * @Date: 2021/12/19
+     * @Description: 转发 hangup
+     **/
     @OnEvent("1v1hangup")
     public void hangup(SocketIOClient client, CurrentConversationVo conversationVo) {
         log.info("1v1hangup ---> roomId：{}", conversationVo.getRoomId());
@@ -498,5 +499,5 @@ public class SocketEventHandler {
             }
         }
     }
-
+    
 }

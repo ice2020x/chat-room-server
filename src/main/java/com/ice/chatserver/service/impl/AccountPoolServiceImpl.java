@@ -7,16 +7,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-/**
- * @author ice2020x
- * @date 2021-12-19 11:26
- * @description:
- */
 @Service
 public class AccountPoolServiceImpl implements AccountPoolService {
     @Resource
     private AccountPoolDao accountPoolDao;
-
+    
     public void saveAccount(AccountPool accountPool) {
         accountPoolDao.save(accountPool);
     }

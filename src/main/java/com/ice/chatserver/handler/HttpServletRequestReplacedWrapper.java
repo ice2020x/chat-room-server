@@ -12,52 +12,46 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-/**
- * @author ice2020x
- */
 public class HttpServletRequestReplacedWrapper extends
         HttpServletRequestWrapper {
-    // 请求报文
+    //请求报文
     private final byte[] body;
-
-    public HttpServletRequestReplacedWrapper(HttpServletRequest request)
-            throws IOException {
+    
+    public HttpServletRequestReplacedWrapper(HttpServletRequest request) throws IOException {
         super(request);
         body = readBytes(request.getReader());
     }
-
+    
     @Override
     public BufferedReader getReader() throws IOException {
         return new BufferedReader(new InputStreamReader(getInputStream()));
     }
-
+    
     @Override
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream bais = new ByteArrayInputStream(body);
         return new ServletInputStream() {
-
             @Override
             public int read() throws IOException {
                 return bais.read();
             }
-
+            
             @Override
             public boolean isFinished() {
                 return false;
             }
-
+            
             @Override
             public boolean isReady() {
                 return false;
             }
-
+            
             @Override
             public void setReadListener(ReadListener readListener) {
-
             }
         };
     }
-
+    
     private byte[] readBytes(BufferedReader br) throws IOException {
         String str = null;
         StringBuilder retStr = new StringBuilder();

@@ -24,28 +24,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author ice2020x
- * @date 2021-12-19 2:08
- * @description: 维持好友关系的逻辑处理类
- */
+//维持好友关系的逻辑处理类
 @Service
 public class GoodFriendServiceImpl implements GoodFriendService {
-
     @Resource
     private MongoTemplate mongoTemplate;
-
+    
     @Autowired
     private UserDao userDao;
-
+    
     @Autowired
     GoodFriendDao goodFriendDao;
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 查询我的好友列表
-     **/
+    
+    //获取我的好友列表
     @Override
     public List<MyFriendListResultVo> getMyFriendsList(String userId) {
         System.out.println(userId);
@@ -68,10 +59,10 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 )
         );
         List<MyFriendListResultVo> resList = new ArrayList<>();
-        // 用户本人加的
+        //用户本人加的
         List<MyFriendListVo> results1 = mongoTemplate.aggregate(aggregation1, "goodfriends", MyFriendListVo.class).getMappedResults();
         System.out.println("results1:" + results1);
-        // 被加的
+        //被加的
         List<MyFriendListVo> results2 = mongoTemplate.aggregate(aggregation2, "goodfriends", MyFriendListVo.class).getMappedResults();
         System.out.println("results2:" + results2);
         MyFriendListResultVo item;
@@ -84,7 +75,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 item.setSignature(son.getUList().get(0).getSignature());
                 item.setId(son.getUList().get(0).getUserId().toString());
                 item.setLevel(computedLevel(son.getUList().get(0).getOnlineTime()));
-                item.setRoomId(userId+"-"+son.getUList().get(0).getUserId().toString());
+                item.setRoomId(userId + "-" + son.getUList().get(0).getUserId().toString());
                 resList.add(item);
             }
         }
@@ -97,46 +88,36 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 item.setSignature(son.getUList().get(0).getSignature());
                 item.setId(son.getUList().get(0).getUserId().toString());
                 item.setLevel(computedLevel(son.getUList().get(0).getOnlineTime()));
-                item.setRoomId(son.getUList().get(0).getUserId().toString()+"-"+userId);
+                item.setRoomId(son.getUList().get(0).getUserId().toString() + "-" + userId);
                 resList.add(item);
             }
         }
         return resList;
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 根据用户在线时间计算用户等级
-     **/
+    
+    //根据用户在线时间计算用户等级
     private Integer computedLevel(Long onlineTime) {
         double toHour = onlineTime.doubleValue() / 1000.0 / 60.0 / 60.0;
         int res = (int) Math.ceil(toHour);
         return Math.min(res, 8);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 根据id列表查询数据，传入的数据为用户id 以及一个最近的id的列表，没有做最近逻辑的判断
-     **/
+    
+    //根据id列表查询数据，传入的数据为用户id 以及一个最近的id的列表，没有做最近逻辑的判断
     @Override
     public List<SingleRecentConversationResultVo> getRecentConversation(RecentConversationVo recentConversationVo) {
         List<ObjectId> friendIds = new ArrayList<>();
         for (String son : recentConversationVo.getRecentFriendIds()) {
             friendIds.add(new ObjectId(son));
         }
-//        比上面查询加了一个in ids 的判断
+        //比上面查询加了一个in ids 的判断
         Criteria criteriaA = Criteria.where("userM").in(friendIds).and("userY").is(new ObjectId(recentConversationVo.getUserId()));
         Criteria criteriaB = Criteria.where("userY").in(friendIds).and("userM").is(new ObjectId(recentConversationVo.getUserId()));
         Criteria criteria = new Criteria();
         criteria.orOperator(criteriaA, criteriaB);
         // 注意查询类型ObjectId
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(
-                        criteria
-                ),
-//                需要user的信息，进行多表的一个映射
+                Aggregation.match(criteria),
+                //需要user的信息，进行多表的一个映射
                 Aggregation.lookup(
                         "users",
                         "userY",
@@ -167,7 +148,8 @@ public class GoodFriendServiceImpl implements GoodFriendService {
             if (son.getUList1().get(0).getUid().equals(son.getUserM())) {
                 BeanUtils.copyProperties(son.getUList1().get(0), userM);
                 BeanUtils.copyProperties(son.getUList2().get(0), userY);
-            } else {
+            }
+            else {
                 BeanUtils.copyProperties(son.getUList1().get(0), userY);
                 BeanUtils.copyProperties(son.getUList2().get(0), userM);
             }
@@ -179,8 +161,8 @@ public class GoodFriendServiceImpl implements GoodFriendService {
         }
         return resultVoList;
     }
-
-
+    
+    //删除好友
     @Override
     public void deleteFriend(DelGoodFriendRequestVo requestVo) {
         //默认userM是主动删除者的ID，userY是被动删除者的ID
@@ -197,12 +179,8 @@ public class GoodFriendServiceImpl implements GoodFriendService {
         delFriendFenZuAndBeiZhu(requestVo.getUserM(), requestVo.getUserY());
         delFriendFenZuAndBeiZhu(requestVo.getUserY(), requestVo.getUserM());
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 删除该好友表中对应的分组信息和备注信息，都要互相更改双方的分组信息
-     **/
+    
+    //删除好友分组和好友备注
     private void delFriendFenZuAndBeiZhu(String myId, String friendId) {
         User userInfo = getUser(myId);
         boolean flag = false;
@@ -212,9 +190,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
             Iterator<String> iterator = item.getValue().iterator();
             while (iterator.hasNext()) {
                 if (iterator.next().equals(friendId)) {
-                    //原来已经在某个分组就从中去掉
                     iterator.remove();
-                    //没必要再循环了
                     flag = true;
                     break;
                 }
@@ -226,7 +202,6 @@ public class GoodFriendServiceImpl implements GoodFriendService {
         Map<String, String> friendBeiZhuMap = userInfo.getFriendBeiZhu();
         System.out.println("备注map：" + friendBeiZhuMap);
         friendBeiZhuMap.remove(friendId);
-
         //更新用户信息
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(new ObjectId(myId)));
@@ -234,43 +209,34 @@ public class GoodFriendServiceImpl implements GoodFriendService {
         update.set("friendFenZu", friendFenZuMap).set("friendBeiZhu", friendBeiZhuMap);
         mongoTemplate.findAndModify(query, update, User.class);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 获取用户信息
-     **/
+    
+    //根据uid获取用户信息
     private User getUser(String uid) {
         return userDao.findById(new ObjectId(uid)).orElse(null);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 根据 roomId 删除两者的聊天记录
-     **/
+    
+    //根据roomId删除两者的聊天记录
     private void delSingleHistoryMessage(String roomId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("roomId").is(roomId));
         mongoTemplate.remove(query, "singlemessages");
     }
-
+    
+    //添加好友
     @Override
     public void addFriend(GoodFriend goodFriend) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("userM").is(goodFriend.getUserM())
-                .and("userY").is(goodFriend.getUserY())
-        );
+        query.addCriteria(Criteria.where("userM").is(goodFriend.getUserM()).and("userY").is(goodFriend.getUserY()));
         GoodFriend one = mongoTemplate.findOne(query, GoodFriend.class);
         if (one == null) {
-            System.out.println("准备添加好友！");
             goodFriendDao.save(goodFriend);
-            //添加好友时顺便将对方默认设置到 我的好友 这个分组
+            //添加好友时顺便将对方默认设置到 bestfriend 这个分组
             modifyNewUserFenZu(goodFriend.getUserM().toString(), goodFriend.getUserY().toString());
             modifyNewUserFenZu(goodFriend.getUserY().toString(), goodFriend.getUserM().toString());
         }
     }
-
+    
+    //修改用户分组
     private void modifyNewUserFenZu(String uid, String friendId) {
         User userInfo = getUser(uid);
         Map<String, ArrayList<String>> friendFenZuMap = userInfo.getFriendFenZu();

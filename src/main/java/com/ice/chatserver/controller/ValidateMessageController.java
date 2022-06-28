@@ -14,23 +14,14 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 22:56
- * @description: 验证消息的类
- */
+//验证消息控制器
 @RequestMapping("/validate")
 @RestController
 public class ValidateMessageController {
-    
     @Resource
     private ValidateMessageService validateMessageService;
     
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 根据条件查询验证消息列表
-     **/
+    //根据条件查询验证消息列表
     @GetMapping("/getMyValidateMessageList")
     @ResponseBody
     public R getMyValidateMessageList(HttpServletRequest request, Integer status, Integer validateType) {
@@ -43,12 +34,7 @@ public class ValidateMessageController {
         return R.ok().data("validateMessageList", validateMessageList);
     }
     
-    
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 根据条件查询某条验证信息
-     **/
+    //根据条件查询某条验证信息
     @GetMapping("/getValidateMessage")
     public R getValidateMessage(String roomId, Integer status, Integer validateType) {
         ValidateMessage validateMessage = validateMessageService.findValidateMessage(roomId, status, validateType);

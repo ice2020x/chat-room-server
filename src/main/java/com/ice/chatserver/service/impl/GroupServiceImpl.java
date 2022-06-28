@@ -30,44 +30,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-/**
- * @author ice2020x
- * @date 2021-12-19 11:41
- * @description:
- */
 @Service
 public class GroupServiceImpl implements GroupService {
-
     @Autowired
     private GroupDao groupDao;
-
-
+    
+    
     @Resource
     private MongoTemplate mongoTemplate;
-
+    
     @Autowired
     private AccountPoolDao accountPoolDao;
-
+    
     @Autowired
     private GroupUserDao groupUserDao;
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 根据id1获取一条记录
-    **/
+    
+    //获取群聊信息
     @Override
     public Group getGroupInfo(String groupId) {
         Optional<Group> res = groupDao.findById(new ObjectId(groupId));
         return res.orElse(null);
     }
-
-    /**
-     * @author ice2020x
-     * @Date: 2021/12/19
-     * @Description: 客户端搜索群聊，分页加模糊查询
-     **/
+    
+    //搜索群聊，分页加模糊查询
     @Override
     public List<SearchGroupResponseVo> searchGroup(SearchRequestVo requestVo, String uid) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -97,14 +82,10 @@ public class GroupServiceImpl implements GroupService {
         }
         return groups;
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 添加群聊
-    **/
+    
+    //添加群聊
     @Override
-    public String createGroup(CreateGroupRequestVo requestVo){
+    public String createGroup(CreateGroupRequestVo requestVo) {
         AccountPool accountPool = new AccountPool();
         //群聊账号
         accountPool.setType(2);
@@ -141,13 +122,8 @@ public class GroupServiceImpl implements GroupService {
         mongoTemplate.upsert(query, update, Group.class);
         return group.getCode();
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 获取群聊列表
-    **/
+    
+    //获取群聊列表
     @Override
     public List<SearchGroupResultVo> getAllGroup() {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -161,13 +137,8 @@ public class GroupServiceImpl implements GroupService {
         AggregationResults<SearchGroupResultVo> groups = mongoTemplate.aggregate(aggregation, "groups", SearchGroupResultVo.class);
         return groups.getMappedResults();
     }
-
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/19
-    * @Description: 退出群聊
-    **/
+    
+    //退出群聊
     @Override
     @Transactional
     public void quitGroup(QuitGroupRequestVo requestVo) {
@@ -181,7 +152,8 @@ public class GroupServiceImpl implements GroupService {
             //3、最后删除群账号：（groups）
             groupDao.deleteById(new ObjectId(requestVo.getGroupId()));
             // 不是群主
-        } else {
+        }
+        else {
             //1、先删除与当前用户发送的所有群信息
             delGroupMessagesByGroupIdAndSenderId(requestVo.getGroupId(), requestVo.getUserId());
             //2、再删除在该群的当前用户
@@ -190,35 +162,40 @@ public class GroupServiceImpl implements GroupService {
             decrGroupUserNum(requestVo.getGroupId());
         }
     }
-
+    
+    //删除群聊所有聊天记录
     private void delGroupAllMessagesByGroupId(String groupId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("roomId").is(groupId));
         DeleteResult groupmessages = mongoTemplate.remove(query, "groupmessages");
         // System.out.println("删除该群所有消息是否成功？" + groupmessages.getDeletedCount());
     }
-
+    
+    //删除群聊的所有成员
     private void delGroupAllUsersByGroupId(String groupId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("groupId").is(new ObjectId(groupId)));
         DeleteResult groupusers = mongoTemplate.remove(query, "groupusers");
-         System.out.println("删除该群所有成员是否成功？" + groupusers.getDeletedCount());
+        System.out.println("删除该群所有成员是否成功？" + groupusers.getDeletedCount());
     }
-
+    
+    //根据群聊ID和发送者uid删除用户所发的群聊消息
     private void delGroupMessagesByGroupIdAndSenderId(String groupId, String senderId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("roomId").is(groupId).and("senderId").is(new ObjectId(senderId)));
         DeleteResult groupmessages = mongoTemplate.remove(query, "groupmessages");
-         System.out.println("删除该用户所发的群消息是否成功？" + groupmessages.getDeletedCount());
+        System.out.println("删除该用户所发的群消息是否成功？" + groupmessages.getDeletedCount());
     }
-
+    
+    //删除群成员
     private void delGroupUserByGroupIdAndUserId(String groupId, String userId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("groupId").is(new ObjectId(groupId)).and("userId").is(new ObjectId(userId)));
         DeleteResult groupusers = mongoTemplate.remove(query, "groupusers");
-         System.out.println("删除该群成员是否成功？" + groupusers.getDeletedCount());
+        System.out.println("删除该群成员是否成功？" + groupusers.getDeletedCount());
     }
-
+    
+    //使群聊人数减一
     private void decrGroupUserNum(String gid) {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(new ObjectId(gid)));
@@ -226,7 +203,6 @@ public class GroupServiceImpl implements GroupService {
         //该群人数减去1
         update.inc("userNum", -1);
         UpdateResult groups = mongoTemplate.upsert(query, update, "groups");
-         System.out.println("该群人数递减1是否成功？" + groups.getModifiedCount());
+        System.out.println("该群人数递减1是否成功？" + groups.getModifiedCount());
     }
-
 }

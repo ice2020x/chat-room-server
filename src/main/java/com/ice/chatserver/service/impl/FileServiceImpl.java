@@ -21,39 +21,38 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
     @Autowired
     private OssProperties ossProperties;
-
+    
     @Autowired
     private FileSystemRepository fileSystemRepository;
-
+    
     @Override
     public FileSystem upload(InputStream inputStream, String model, String originalFilename, FileSystem fileSystem) {
         String endpoint = ossProperties.getEndpoint();
         String accessKeyId = ossProperties.getAccessKeyId();
         String accessKeySecret = ossProperties.getAccessKeySecret();
         String bucketName = ossProperties.getBucketName();
-
-
+        
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        if(!ossClient.doesBucketExist(bucketName)){
+        if (!ossClient.doesBucketExist(bucketName)) {
             ossClient.createBucket(bucketName);
             ossClient.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
         }
-//        构建objectName
-        String fileName =UUID.randomUUID().toString();
+        //构建objectName
+        String fileName = UUID.randomUUID().toString();
         String fileExt = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String key = model+"/"+fileName+fileExt;
-
-        ossClient.putObject(bucketName,key,inputStream);
+        String key = model + "/" + fileName + fileExt;
+        
+        ossClient.putObject(bucketName, key, inputStream);
         ossClient.shutdown();
-        fileSystem.setFilePath("https://"+bucketName+"."+endpoint+"/"+key);
-        fileSystem.setFileName(fileName+fileExt);
+        fileSystem.setFilePath("https://" + bucketName + "." + endpoint + "/" + key);
+        fileSystem.setFileName(fileName + fileExt);
         fileSystem.setFileType(fileExt.substring(1));
-
+        
         fileSystemRepository.save(fileSystem);
-
+        
         return fileSystem;
     }
-
+    
     @Override
     public void removeFile(String url) {
         String endpoint = ossProperties.getEndpoint();
@@ -61,46 +60,40 @@ public class FileServiceImpl implements FileService {
         String accessKeySecret = ossProperties.getAccessKeySecret();
         String bucketName = ossProperties.getBucketName();
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        String host = "https://"+bucketName+"."+endpoint+"/";
+        String host = "https://" + bucketName + "." + endpoint + "/";
         String objectName = url.substring(host.length());
-        ossClient.deleteObject(bucketName,objectName);
+        ossClient.deleteObject(bucketName, objectName);
         ossClient.shutdown();
     }
-
+    
     @Override
     public FileSystem fileSystemById(String id) {
         Optional<FileSystem> byId = fileSystemRepository.findById(id);
         return byId.orElse(null);
     }
-
+    
     @Override
     public void removeFileSystem(String url) {
         fileSystemRepository.deleteByFilePath(url);
     }
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 文件下载
-    **/
+    
+    //文件下载
     @Override
     public Byte[] downloadFile(String fileName, HttpServletResponse resp) {
         String endpoint = ossProperties.getEndpoint();
         String accessKeyId = ossProperties.getAccessKeyId();
         String accessKeySecret = ossProperties.getAccessKeySecret();
         String bucketName = ossProperties.getBucketName();
-
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        if(!ossClient.doesBucketExist(bucketName)){
+        if (!ossClient.doesBucketExist(bucketName)) {
             ossClient.createBucket(bucketName);
             ossClient.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
         }
-
         return new Byte[0];
     }
-
+    
     static private class DateFormatterUtils {
-        public static String  getFormatterDate(Date date) {
+        public static String getFormatterDate(Date date) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
             return simpleDateFormat.format(date);
         }

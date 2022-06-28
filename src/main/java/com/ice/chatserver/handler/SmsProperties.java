@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "tenxunyun.sms")
 public class SmsProperties {
-
+    
     private Integer appid;
-
+    
     private String appkey;
-
+    
     private Integer templateId;
-
+    
     private String smsSign;
 }

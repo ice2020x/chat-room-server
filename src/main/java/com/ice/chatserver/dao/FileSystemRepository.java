@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FileSystemRepository extends MongoRepository<FileSystem, String> {
-
     void deleteByFilePath(String filePath);
 }

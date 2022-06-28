@@ -14,35 +14,22 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author ice2020x
- * @date 2021-12-18 20:40
- * @description: 过滤消息的，过滤器,字典树判断，网上找的工具类
- */
+//过滤消息，过滤器,字典树判断
 @Component
 public class SensitiveFilter {
     private static final Logger logger = LoggerFactory.getLogger(SensitiveFilter.class);
-
-    // 替换符
-    private static final String REPLACEMENT = "***";
-
-    // 根节点
-    private TrieNode rootNode = new TrieNode();
-
-    /**
-    * @author ice2020x
-    * @Date: 2021/12/18
-    * @Description: 这个注解的作用：当本类被实例化成bean时，在调用构造器时init方法自动被调用,初始化
-    **/
+    
+    private static final String REPLACEMENT = "***"; //替换符
+    
+    private TrieNode rootNode = new TrieNode(); //根节点
+    
+    //当本类被实例化成bean时，在调用构造器时init方法自动被调用，初始化
     @PostConstruct
     public void init() {
-        try (
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt")
-        ) {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("sensitive-words.txt")) {
             assert is != null;
-            try (// 字符流转换为缓冲流，速度更快
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(is))
-            ) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                //字符流转换为缓冲流，速度更快
                 String keyword;
                 while ((keyword = reader.readLine()) != null) {
                     // 添加到前缀树
@@ -53,34 +40,34 @@ public class SensitiveFilter {
             logger.error("加载敏感词文件失败: " + e.getMessage());
         }
     }
-
-    // 前缀树
+    
+    //前缀树
     private class TrieNode {
         // 关键词结束标识
         private boolean isKeywordEnd = false;
-
+        
         // 子节点(key是下级字符,value是下级节点)
         private Map<Character, TrieNode> subNodes = new HashMap<>();
-
+        
         public boolean isKeywordEnd() {
             return isKeywordEnd;
         }
-
+        
         public void setKeywordEnd(boolean keywordEnd) {
             isKeywordEnd = keywordEnd;
         }
-
+        
         // 添加子节点
         public void addSubNode(Character c, TrieNode node) {
             subNodes.put(c, node);
         }
-
+        
         // 获取子节点
         public TrieNode getSubNode(Character c) {
             return subNodes.get(c);
         }
     }
-
+    
     // 将一个敏感词添加到前缀树中
     private void addKeyword(String keyword) {
         TrieNode tempNode = rootNode;
@@ -100,13 +87,8 @@ public class SensitiveFilter {
             }
         }
     }
-
-    /**
-     * 过滤敏感词
-     *
-     * @param text 待过滤的文本
-     * @return 过滤后的文本
-     */
+    
+    //过滤敏感词
     public String[] filter(String text) {
         if (StringUtils.isBlank(text)) {
             return null;
@@ -143,7 +125,8 @@ public class SensitiveFilter {
                 end = ++begin;
                 // 重新指向根节点
                 tempNode = rootNode;
-            } else if (tempNode.isKeywordEnd()) {
+            }
+            else if (tempNode.isKeywordEnd()) {
                 // 发现敏感词，将begin~position字符串替换掉
                 flag = 1;
                 sb.append(REPLACEMENT);
@@ -151,7 +134,8 @@ public class SensitiveFilter {
                 begin = ++end;
                 // 重新指向根节点
                 tempNode = rootNode;
-            } else {
+            }
+            else {
                 // 其他情况：继续检查下一个字符
                 end++;
             }
@@ -160,8 +144,8 @@ public class SensitiveFilter {
         sb.append(text.substring(begin));
         return new String[]{sb.toString(), flag + ""};
     }
-
-    // 判断是否为符号
+    
+    //判断是否为符号
     private boolean isSymbol(Character c) {
         // 0x2E80~0x9FFF 是东亚文字范围
         return !CharUtils.isAsciiAlphanumeric(c) && (c < 0x2E80 || c > 0x9FFF);

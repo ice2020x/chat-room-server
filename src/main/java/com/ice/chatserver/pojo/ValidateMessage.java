@@ -6,11 +6,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * @author ice2020x
- * @Date: 2021/12/19
- * @Description: 验证消息
- **/
 @Data
 @NoArgsConstructor
 @Document(collection = "validatemessages")

@@ -14,17 +14,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.Resource;
-/**
-* @author ice2020x
-* @Date: 2021/12/19
-* @Description: 监听设置某个集合的主键值加1 处理那个注解
-**/
+
+//监听设置某个集合的主键值加1 处理那个注解
 @Component
 public class SaveEventListener extends AbstractMongoEventListener<AccountPool> {
-
     @Resource
     private MongoTemplate mongoTemplate;
-
+    
     @Override
     public void onBeforeConvert(BeforeConvertEvent<AccountPool> event) {
         final Object source = event.getSource();
@@ -37,7 +33,7 @@ public class SaveEventListener extends AbstractMongoEventListener<AccountPool> {
             }
         });
     }
-
+    
     private Long getNextId(String collName) {
         Query query = new Query(Criteria.where("collName").is(collName));
         Update update = new Update();

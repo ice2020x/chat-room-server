@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-
-/**
- * 用户设置
- */
+//用户设置控制器
 @RequestMapping("/user/setting")
 @RestController
 public class UserSettingController {

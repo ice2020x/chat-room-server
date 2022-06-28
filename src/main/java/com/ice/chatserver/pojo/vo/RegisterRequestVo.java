@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterRequestVo {
     private String mobile;
-    private String  password;
+    private String password;
     private String code;
 }

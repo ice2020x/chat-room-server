@@ -4,11 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
-* @author ice2020x
-* @Date: 2021/12/18
-* @Description: 城市信息实体类
-**/
+//城市信息实体类
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -50,7 +50,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
     public List<MyFriendListResultVo> getMyFriendsList(String userId) {
         System.out.println(userId);
         Aggregation aggregation1 = Aggregation.newAggregation( // 注意查询类型ObjectId
-                Aggregation.match(Criteria.where("userM").is(userId)),
+                Aggregation.match(Criteria.where("userM").is(new ObjectId(userId))),
                 Aggregation.lookup(
                         "users",
                         "userY",
@@ -59,7 +59,7 @@ public class GoodFriendServiceImpl implements GoodFriendService {
                 )
         );
         Aggregation aggregation2 = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("userY").is(userId)),
+                Aggregation.match(Criteria.where("userY").is(new ObjectId(userId))),
                 Aggregation.lookup(
                         "users",
                         "userM",
@@ -75,7 +75,6 @@ public class GoodFriendServiceImpl implements GoodFriendService {
         List<MyFriendListVo> results2 = mongoTemplate.aggregate(aggregation2, "goodfriends", MyFriendListVo.class).getMappedResults();
         System.out.println("results2:" + results2);
         MyFriendListResultVo item;
-//        映射没有做好，需要手动添加
         for (MyFriendListVo son : results1) {
             if (!ObjectUtils.isEmpty(son.getUList())) {
                 item = new MyFriendListResultVo();
@@ -103,7 +102,6 @@ public class GoodFriendServiceImpl implements GoodFriendService {
             }
         }
         return resList;
-
     }
 
     /**
